@@ -1,61 +1,40 @@
-//
-//  ContentView.swift
-//  GreekWordsB1
-//
-//  Created by Админ on 27/10/2025.
-//
-
 import SwiftUI
 import SwiftData
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Environment(\.modelContext) private var context
+    @State private var showCategories = false
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
-                    }
+        NavigationStack {
+            VStack(spacing: 20) {
+                Text("Greek Words")
+                    .font(.largeTitle)
+                
+                Button("Show Categories") {
+                    showCategories = true
                 }
-                .onDelete(perform: deleteItems)
+                .buttonStyle(.borderedProminent)
+                .padding()
+                
+                Spacer()
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
-                    }
-                }
+            .navigationDestination(isPresented: $showCategories) {
+                GroupsListView()
             }
-        } detail: {
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+            .task {
+                await syncVocabulary()
             }
         }
     }
-}
-
-#Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+    
+    func syncVocabulary() async {
+        do {
+            let url = URL(string: "https://azonaz.github.io/words-gr-b1.json")!
+            let service = VocabularySyncService(context: context, remoteURL: url)
+            try await service.syncVocabulary()
+        } catch {
+            print("Synchronisation error: \(error)")
+        }
+    }
 }
