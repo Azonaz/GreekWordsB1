@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @State private var currentLanguage = Locale.current.language.languageCode?.identifier ?? "en"
+    @Environment(\.horizontalSizeClass) var sizeClass
     
     var body: some View {
         ZStack {
@@ -30,7 +31,14 @@ struct SettingsView: View {
                 }
             }
         }
-        .navigationTitle(Texts.settings)
+        .navigationTitle("")
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(Texts.settings)
+                    .font(sizeClass == .regular ? .largeTitle : .title2)
+                    .foregroundColor(.primary)
+            }
+        }
         .scrollContentBackground(.hidden)
         .onAppear {
             updateLanguage()

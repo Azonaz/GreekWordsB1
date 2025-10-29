@@ -13,6 +13,14 @@ struct GroupsListView: View {
     private var cornerRadius: CGFloat {
         sizeClass == .regular ? 30 : 20
     }
+    
+    private var paddingHorizontal: CGFloat {
+        sizeClass == .regular ? 48 : 24
+    }
+    
+    private var isEnglish: Bool {
+        Locale.preferredLanguages.first?.hasPrefix("en") == true
+    }
 
     var body: some View {
         ZStack {
@@ -23,11 +31,11 @@ struct GroupsListView: View {
                 VStack(spacing: 16) {
                     ForEach(groups) { group in
                         NavigationLink(destination: Text(group.nameRu)) {
-                            Text(group.nameEn)
+                            Text(isEnglish ? group.nameEn : group.nameRu)
                                 .font(sizeClass == .regular ? .title2 : .title3)
                                 .foregroundColor(.primary)
                                 .glassCard(height: cardHeight, cornerRadius: cornerRadius)
-                                .padding(.horizontal, 16)
+                                .padding(.horizontal, paddingHorizontal)
                         }
                     }
                 }
@@ -41,7 +49,14 @@ struct GroupsListView: View {
                 .ignoresSafeArea()
                 .opacity(0.2)
         )
-        .navigationTitle(Texts.categories)
+        .navigationTitle("")
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(Texts.categories)
+                    .font(sizeClass == .regular ? .largeTitle : .title2)
+                    .foregroundColor(.primary)
+            }
+        }
     }
 }
 
