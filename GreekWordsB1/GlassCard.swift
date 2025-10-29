@@ -2,7 +2,6 @@ import SwiftUI
 
 struct GlassCard: ViewModifier {
     var height: CGFloat
-    var horizontalPadding: CGFloat
     var cornerRadius: CGFloat
 
     func body(content: Content) -> some View {
@@ -33,12 +32,11 @@ struct GlassCard: ViewModifier {
                 .allowsHitTesting(false)
             )
             .shadow(radius: 3)
-            .padding(.horizontal, horizontalPadding)
     }
 }
 
 extension View {
-    func glassCard(height: CGFloat, cornerRadius: CGFloat, padding: CGFloat) -> some View {
-        modifier(GlassCard(height: height, horizontalPadding: padding, cornerRadius: cornerRadius))
+    func glassCard(height: CGFloat, cornerRadius: CGFloat) -> some View {
+        modifier(GlassCard(height: height, cornerRadius: cornerRadius))
     }
 }

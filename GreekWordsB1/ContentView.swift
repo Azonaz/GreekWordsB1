@@ -25,11 +25,11 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.pink.opacity(0.1)
-                    .edgesIgnoringSafeArea(.all)
+                Color.gray.opacity(0.05)
+                    .ignoresSafeArea()
                 
                 VStack(spacing: 20) {
-                    Text("Greek Words A2")
+                    Text("Greek Words B1")
                         .font(sizeClass == .regular ? .largeTitle : .title)
                         .fontWeight(.semibold)
                         .padding(.top, topPadding)
@@ -37,17 +37,59 @@ struct ContentView: View {
                     Spacer()
                     
                     NavigationLink(destination: GroupsListView()) {
-                        Text("Quiz")
+                        Text(Texts.quiz)
                             .foregroundColor(.primary)
-                            .glassCard(height: buttonHeight, cornerRadius: cornerRadius, padding: buttonPaddingHorizontal)
+                            .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
                     }
+                    .padding(.horizontal, buttonPaddingHorizontal)
                     
-                    Text("Coming soon")
-                        .glassCard(height: buttonHeight, cornerRadius: cornerRadius, padding: buttonPaddingHorizontal)
+                    Text(Texts.soon)
+                        .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
+                        .padding(.top, topPadding)
+                        .padding(.horizontal, buttonPaddingHorizontal)
                     
                     Spacer()
+                    
+                    HStack(spacing: 24) {
+                        Button {
+                            print("Info tapped")
+                        } label: {
+                            Image(systemName: "info.circle")
+                                .font(.system(size: 24, weight: .regular))
+                                .frame(maxWidth: .infinity)
+                                .glassCard(height: 55, cornerRadius: 25)
+                        }
+                        
+                        Button {
+                            print("Statistics tapped")
+                        } label: {
+                            Image(systemName: "chart.bar")
+                                .font(.system(size: 24, weight: .regular))
+                                .frame(maxWidth: .infinity)
+                                .glassCard(height: 55, cornerRadius: 25)
+                        }
+                        
+                        NavigationLink {
+                            SettingsView()
+                        } label: {
+                            Image(systemName: "gear")
+                                .font(.system(size: 24, weight: .regular))
+                                .frame(maxWidth: .infinity)
+                                .glassCard(height: 55, cornerRadius: 25)
+                        }
+                    }
+                    .foregroundColor(.primary)
+                    .padding(.horizontal, buttonPaddingHorizontal)
+                    .padding(.bottom, 20)
                 }
             }
+            .background(
+                Image(.pillar)
+                    .resizable()
+                    .scaledToFill()
+                    .ignoresSafeArea()
+                    .opacity(0.2)
+            )
             .task {
                 await syncVocabulary()
             }
@@ -56,7 +98,7 @@ struct ContentView: View {
     
     func syncVocabulary() async {
         do {
-            let url = URL(string: "https://azonaz.github.io/words-gr-b1.json")!
+            let url = URL(string: baseURL)!
             let service = VocabularySyncService(context: context, remoteURL: url)
             try await service.syncVocabulary()
         } catch {

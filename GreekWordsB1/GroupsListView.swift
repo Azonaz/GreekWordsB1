@@ -3,12 +3,45 @@ import SwiftData
 
 struct GroupsListView: View {
     @Query(sort: \GroupMeta.nameEn) private var groups: [GroupMeta]
+    @Environment(\.horizontalSizeClass) var sizeClass
+    @Environment(\.dismiss) private var dismiss
     
+    private var cardHeight: CGFloat {
+        sizeClass == .regular ? 70 : 50
+    }
+    
+    private var cornerRadius: CGFloat {
+        sizeClass == .regular ? 30 : 20
+    }
+
     var body: some View {
-        List(groups) { group in
-            Text(group.nameEn)
+        ZStack {
+            Color.gray.opacity(0.05)
+                .ignoresSafeArea()
+
+            ScrollView {
+                VStack(spacing: 16) {
+                    ForEach(groups) { group in
+                        NavigationLink(destination: Text(group.nameRu)) {
+                            Text(group.nameEn)
+                                .font(sizeClass == .regular ? .title2 : .title3)
+                                .foregroundColor(.primary)
+                                .glassCard(height: cardHeight, cornerRadius: cornerRadius)
+                                .padding(.horizontal, 16)
+                        }
+                    }
+                }
+                .padding(.top, 60)
+            }
         }
-        .navigationTitle("Categories")
+        .background(
+            Image(.pillar)
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+                .opacity(0.2)
+        )
+        .navigationTitle(Texts.categories)
     }
 }
 
@@ -16,12 +49,12 @@ struct GroupsListView: View {
     let schema = Schema([GroupMeta.self, Word.self, WordProgress.self])
     let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: schema, configurations: [config])
-
+    
     let ctx = ModelContext(container)
     ctx.insert(GroupMeta(id: 1, version: 1, nameEn: "Meeting", nameRu: "Встреча"))
     ctx.insert(GroupMeta(id: 2, version: 1, nameEn: "Family",  nameRu: "Семья"))
     ctx.insert(GroupMeta(id: 3, version: 2, nameEn: "Travel",  nameRu: "Путешествия"))
-
+    
     return NavigationStack {
         GroupsListView()
     }

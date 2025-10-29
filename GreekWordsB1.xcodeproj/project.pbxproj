@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		847EF0162EB2660700B068B2 /* Localizable.strings in Sources */ = {isa = PBXBuildFile; fileRef = 847EF0152EB2660700B068B2 /* Localizable.strings */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		84F3502F2EAF7CEC00E9C8C9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,6 +28,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		847EF0142EB2660700B068B2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		847EF0172EB2660900B068B2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		84F3501F2EAF7CEA00E9C8C9 /* GreekWordsB1.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GreekWordsB1.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84F3502E2EAF7CEC00E9C8C9 /* GreekWordsB1Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GreekWordsB1Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		84F350382EAF7CEC00E9C8C9 /* GreekWordsB1UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GreekWordsB1UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -75,6 +81,7 @@
 		84F350162EAF7CEA00E9C8C9 = {
 			isa = PBXGroup;
 			children = (
+				847EF0152EB2660700B068B2 /* Localizable.strings */,
 				84F350212EAF7CEA00E9C8C9 /* GreekWordsB1 */,
 				84F350312EAF7CEC00E9C8C9 /* GreekWordsB1Tests */,
 				84F3503B2EAF7CEC00E9C8C9 /* GreekWordsB1UITests */,
@@ -192,6 +199,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = 84F350162EAF7CEA00E9C8C9;
 			minimizedProjectReferenceProxies = 1;
@@ -236,6 +244,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				847EF0162EB2660700B068B2 /* Localizable.strings in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,6 +276,18 @@
 			targetProxy = 84F350392EAF7CEC00E9C8C9 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		847EF0152EB2660700B068B2 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				847EF0142EB2660700B068B2 /* en */,
+				847EF0172EB2660900B068B2 /* ru */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		84F350402EAF7CEC00E9C8C9 /* Debug */ = {
