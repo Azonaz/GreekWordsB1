@@ -3,11 +3,23 @@ import SwiftUI
 struct GlassCard: ViewModifier {
     var height: CGFloat
     var cornerRadius: CGFloat
-
+    var highlightColors: [Color]? = nil
+    
+    @State private var glowStrength: CGFloat = 0
+    @State private var phase: CGFloat = 0
+    
+    private let sweepDuration: Double = 1.4
+    private let lineW: CGFloat = 3
+    private let segment: CGFloat = 0.5
+    
+    private var glowColor: Color {
+        highlightColors?.first ?? .clear
+    }
+    
     func body(content: Content) -> some View {
         let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-
-        return content
+        
+        content
             .multilineTextAlignment(.center)
             .lineLimit(1)
             .frame(height: height)
@@ -16,10 +28,14 @@ struct GlassCard: ViewModifier {
             .foregroundStyle(.primary)
             .background(.ultraThinMaterial, in: shape)
             .contentShape(shape)
+        
+        // baselines
             .overlay(
-                shape.stroke(.white.opacity(0.25), lineWidth: 1)
+                shape.stroke(.white.opacity(0.25), lineWidth: 2)
                     .allowsHitTesting(false)
             )
+        
+        // base top glow
             .overlay(
                 shape.fill(
                     LinearGradient(
@@ -31,12 +47,61 @@ struct GlassCard: ViewModifier {
                 .opacity(0.7)
                 .allowsHitTesting(false)
             )
+        
+        // base shadow
             .shadow(radius: 3)
+        
+        // running outline
+            .overlay(
+                ZStack {
+                    let baseColors = highlightColors?.map { $0.opacity(0.4) } ?? [.clear, .clear]
+                    
+                    shape
+                        .trim(from: phase, to: min(phase + segment, 1))
+                        .stroke(
+                            LinearGradient(colors: baseColors,
+                                           startPoint: .topLeading,
+                                           endPoint: .bottomTrailing),
+                            style: StrokeStyle(lineWidth: lineW, lineCap: .round)
+                        )
+                    
+                    if phase + segment > 1 {
+                        shape
+                            .trim(from: 0, to: (phase + segment).truncatingRemainder(dividingBy: 1))
+                            .stroke(
+                                LinearGradient(colors: baseColors,
+                                               startPoint: .topLeading,
+                                               endPoint: .bottomTrailing),
+                                style: StrokeStyle(lineWidth: lineW, lineCap: .round)
+                            )
+                    }
+                }
+                    .opacity(highlightColors == nil ? 0 : 1)
+                    .allowsHitTesting(false)
+            )
+            .onAppear {
+                phase = 0
+                withAnimation(.linear(duration: sweepDuration).repeatForever(autoreverses: false)) {
+                    phase = 1
+                }
+            }
+        
+        // colour shadow when displaying results
+            .shadow(color: glowColor.opacity(glowStrength * 0.45), radius: 10, x: 0, y: 6)
+            .shadow(color: glowColor.opacity(glowStrength * 0.25), radius: 18, x: 0, y: 10)
+        
+            .onChange(of: highlightColors) {
+                if highlightColors != nil {
+                    withAnimation(.easeOut(duration: 0.25)) { glowStrength = 1 }
+                } else {
+                    withAnimation(.easeInOut(duration: 0.5)) { glowStrength = 0 }
+                }
+            }
     }
 }
 
 extension View {
-    func glassCard(height: CGFloat, cornerRadius: CGFloat) -> some View {
-        modifier(GlassCard(height: height, cornerRadius: cornerRadius))
+    func glassCard(height: CGFloat, cornerRadius: CGFloat, highlightColors: [Color]? = nil) -> some View {
+        modifier(GlassCard(height: height, cornerRadius: cornerRadius, highlightColors: highlightColors))
     }
 }

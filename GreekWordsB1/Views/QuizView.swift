@@ -8,6 +8,8 @@ struct QuizView: View {
     
     @State private var currentWord: Word?
     @State private var options: [Word] = []
+    @State private var selectedWord: Word?
+    @State private var isCorrect: Bool?
     @State private var isEnglish: Bool = Locale.preferredLanguages.first?.hasPrefix("en") == true
     
     private var paddingHorizontal: CGFloat {
@@ -42,8 +44,13 @@ struct QuizView: View {
                             Text(isEnglish ? word.en : word.ru)
                                 .font(.title3)
                                 .foregroundColor(.primary)
-                                .glassCard(height: sizeClass == .regular ? 80 : 60, cornerRadius: cornerRadius)
+                                .glassCard(
+                                    height: sizeClass == .regular ? 80 : 60,
+                                    cornerRadius: cornerRadius,
+                                    highlightColors: highlightColors(for: word)
+                                )
                                 .padding(.horizontal, paddingHorizontal)
+                                .onTapGesture { handleTap(word) }
                         }
                     }
                 } else {
@@ -61,7 +68,27 @@ struct QuizView: View {
             }
         }
     }
+ 
+    private func handleTap(_ word: Word) {
+        guard selectedWord == nil else { return }
+        selectedWord = word
+        isCorrect = (word.compositeID == currentWord?.compositeID)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
+            withAnimation {
+                selectedWord = nil
+                isCorrect = nil
+                setupRound()
+            }
+        }
+    }
     
+    private func highlightColors(for word: Word) -> [Color]? {
+        guard let selectedWord else { return nil }
+        if word.compositeID != selectedWord.compositeID { return nil }
+        return isCorrect == true ? [.green.opacity(0.4), .green.opacity(0.7), .green.opacity(0.4)] : [.red.opacity(0.4), .red.opacity(0.8), .red.opacity(0.4)]
+    }
+
     private func setupRound() {
         guard words.count >= 3 else { return }
         

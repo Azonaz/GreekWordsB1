@@ -63,7 +63,7 @@ struct ContentView: View {
                         Button {
                             print("Statistics tapped")
                         } label: {
-                            Image(systemName: "chart.bar")
+                            Image(systemName: "chart.pie")
                                 .font(.system(size: 24, weight: .regular))
                                 .frame(maxWidth: .infinity)
                                 .glassCard(height: 55, cornerRadius: 25)
