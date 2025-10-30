@@ -75,7 +75,7 @@ struct GlassCard: ViewModifier {
             }
     }
 
-    fileprivate func runningOutlineOverlay(_ shape: RoundedRectangle) -> some View {
+    private func runningOutlineOverlay(_ shape: RoundedRectangle) -> some View {
         return ZStack {
             let baseColors = highlightColors?.map { $0.opacity(0.4) } ?? [.clear, .clear]
 

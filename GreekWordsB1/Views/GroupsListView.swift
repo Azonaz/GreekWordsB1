@@ -39,7 +39,7 @@ struct GroupsListView: View {
                         }
                     }
                 }
-                .padding(.top, 60)
+                .padding(.top, sizeClass == .regular ? 60 : 40)
             }
         }
         .background(
