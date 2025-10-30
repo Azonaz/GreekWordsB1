@@ -9,4 +9,3 @@ enum Texts {
     static let settings: LocalizedStringKey = "settings"
     static let language: LocalizedStringKey = "language"
 }
-    

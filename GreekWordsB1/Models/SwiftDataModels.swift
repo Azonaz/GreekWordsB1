@@ -1,6 +1,7 @@
 import SwiftData
 
 @Model
+// swiftlint:disable identifier_name
 final class Word {
     @Attribute(.unique) var compositeID: String
     var localID: Int
@@ -8,7 +9,7 @@ final class Word {
     var gr: String
     var en: String
     var ru: String
-    
+
     init(localID: Int, groupID: Int, gr: String, en: String, ru: String) {
         self.localID = localID
         self.groupID = groupID
@@ -18,6 +19,7 @@ final class Word {
         self.compositeID = "\(groupID)_\(localID)"
     }
 }
+// swiftlint:enable identifier_name
 
 @Model
 final class GroupMeta {
@@ -25,7 +27,7 @@ final class GroupMeta {
     var version: Int
     var nameEn: String
     var nameRu: String
-    
+
     init(id: Int, version: Int, nameEn: String, nameRu: String) {
         self.id = id
         self.version = version

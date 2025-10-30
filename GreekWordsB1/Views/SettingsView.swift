@@ -3,12 +3,12 @@ import SwiftUI
 struct SettingsView: View {
     @State private var currentLanguage = Locale.current.language.languageCode?.identifier ?? "en"
     @Environment(\.horizontalSizeClass) var sizeClass
-    
+
     var body: some View {
         ZStack {
             Color.gray.opacity(0.05)
                 .ignoresSafeArea()
-            
+
             List {
                 Button {
                     openAppSettings()
@@ -16,15 +16,15 @@ struct SettingsView: View {
                     HStack {
                         Image(systemName: "globe")
                             .foregroundColor(.primary)
-                        
+
                         Text(Texts.language)
                             .foregroundColor(.primary)
-                        
+
                         Spacer()
-                        
+
                         Text(displayName(for: currentLanguage))
                             .foregroundColor(.secondary)
-                        
+
                         Image(systemName: "chevron.right")
                             .foregroundColor(.primary)
                     }
@@ -55,7 +55,7 @@ struct SettingsView: View {
     private func updateLanguage() {
         currentLanguage = Locale.current.language.languageCode?.identifier ?? "en"
     }
-    
+
     private func displayName(for code: String) -> String {
         switch code {
         case "ru": return "Русский"

@@ -1,3 +1,4 @@
+// swiftlint:disable identifier_name
 struct VocabularyFile: Codable {
     let vocabulary: Vocabulary
 }
@@ -24,3 +25,4 @@ struct WordItem: Codable {
     let en: String
     let ru: String
 }
+// swiftlint:enable identifier_name

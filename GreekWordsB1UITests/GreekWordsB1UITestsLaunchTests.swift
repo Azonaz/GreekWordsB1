@@ -1,15 +1,8 @@
-//
-//  GreekWordsB1UITestsLaunchTests.swift
-//  GreekWordsB1UITests
-//
-//  Created by Админ on 27/10/2025.
-//
-
 import XCTest
 
 final class GreekWordsB1UITestsLaunchTests: XCTestCase {
 
-    override class var runsForEachTargetApplicationUIConfiguration: Bool {
+    override static var runsForEachTargetApplicationUIConfiguration: Bool {
         true
     }
 

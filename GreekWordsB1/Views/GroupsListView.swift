@@ -5,19 +5,19 @@ struct GroupsListView: View {
     @Query(sort: \GroupMeta.nameEn) private var groups: [GroupMeta]
     @Environment(\.horizontalSizeClass) var sizeClass
     @Environment(\.dismiss) private var dismiss
-    
+
     private var cardHeight: CGFloat {
         sizeClass == .regular ? 70 : 50
     }
-    
+
     private var cornerRadius: CGFloat {
         sizeClass == .regular ? 30 : 20
     }
-    
+
     private var paddingHorizontal: CGFloat {
         sizeClass == .regular ? 48 : 24
     }
-    
+
     private var isEnglish: Bool {
         Locale.preferredLanguages.first?.hasPrefix("en") == true
     }
@@ -63,13 +63,16 @@ struct GroupsListView: View {
 #Preview {
     let schema = Schema([GroupMeta.self, Word.self, WordProgress.self])
     let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: schema, configurations: [config])
-    
+
+    guard let container = try? ModelContainer(for: schema, configurations: [config]) else {
+        return Text("Container creation error")
+    }
+
     let ctx = ModelContext(container)
     ctx.insert(GroupMeta(id: 1, version: 1, nameEn: "Meeting", nameRu: "Встреча"))
-    ctx.insert(GroupMeta(id: 2, version: 1, nameEn: "Family",  nameRu: "Семья"))
-    ctx.insert(GroupMeta(id: 3, version: 2, nameEn: "Travel",  nameRu: "Путешествия"))
-    
+    ctx.insert(GroupMeta(id: 2, version: 1, nameEn: "Family", nameRu: "Семья"))
+    ctx.insert(GroupMeta(id: 3, version: 2, nameEn: "Travel", nameRu: "Путешествия"))
+
     return NavigationStack {
         GroupsListView()
     }
