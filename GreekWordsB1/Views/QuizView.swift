@@ -15,6 +15,7 @@ struct QuizView: View {
     @State private var correctCount = 0
     @State private var showResult = false
     @State private var isEnglish: Bool = Locale.preferredLanguages.first?.hasPrefix("en") == true
+    @State private var answersBlurred = true
 
     private var currentWord: Word? {
         quizWords.isEmpty ? nil : quizWords[currentIndex]
@@ -52,20 +53,31 @@ struct QuizView: View {
                             Text(isEnglish ? word.en : word.ru)
                                 .font(.title3)
                                 .foregroundColor(.primary)
+                                .blur(radius: answersBlurred ? 8 : 0)
+                                .opacity(answersBlurred ? 0.9 : 1)
+                                .animation(.easeInOut(duration: 0.3), value: answersBlurred)
                                 .glassCard(
                                     height: sizeClass == .regular ? 80 : 60,
                                     cornerRadius: cornerRadius,
                                     highlightColors: highlightColors(for: word)
                                 )
                                 .padding(.horizontal, paddingHorizontal)
-                                .onTapGesture { handleTap(word) }
+                                .onTapGesture {
+                                    if !answersBlurred {
+                                        handleTap(word)
+                                    }
+                                }
                                 .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
                     }
-                    .animation(.spring(response: 0.5, dampingFraction: 0.8), value: options)
-
                 } else {
                     ProgressView()
+                }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    answersBlurred = false
                 }
             }
         }
@@ -109,12 +121,9 @@ struct QuizView: View {
         let others = words.filter { $0.compositeID != currentWord.compositeID }.shuffled()
         let newOptions = ([currentWord] + others.prefix(2)).shuffled()
 
-        withAnimation(.easeInOut(duration: 0.4)) {
-            options = newOptions.map { word in
-                let word = word
-                word.compositeID = "\(word.compositeID)_\(UUID().uuidString.prefix(4))"
-                return word
-            }
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+            options = newOptions
+            answersBlurred = true
         }
     }
 
