@@ -155,7 +155,18 @@ struct QuizView: View {
         selectedWord = word
         let correct = (word.compositeID == currentWord?.compositeID)
         isCorrect = correct
-        if correct { correctCount += 1 } else { shake() }
+        if correct {
+            correctCount += 1
+        } else {
+            shake()
+
+            let impact = UIImpactFeedbackGenerator(style: .medium)
+            impact.impactOccurred()
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
+                impact.impactOccurred(intensity: 0.5)
+            }
+        }
 
         haptic.selectionChanged()
         haptic.prepare()
