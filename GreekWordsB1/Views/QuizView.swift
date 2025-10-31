@@ -16,7 +16,7 @@ struct QuizView: View {
     @State private var correctCount = 0
     @State private var showResult = false
     @State private var isEnglish: Bool = Locale.preferredLanguages.first?.hasPrefix("en") == true
-    @AppStorage("isBlurEnabled") private var isBlurEnabled = true
+    @AppStorage("isBlurEnabled") private var isBlurEnabled = false
     @State private var answersBlurred = false
     @State private var haptic = UISelectionFeedbackGenerator()
     @State private var shakeOffset: CGFloat = 0
@@ -71,7 +71,7 @@ struct QuizView: View {
                                 )
                                 .padding(.horizontal, paddingHorizontal)
                                 .onTapGesture {
-                                    if !answersBlurred && !isInteractionDisabled {
+                                    if !isInteractionDisabled {
                                         handleTap(word)
                                     }
                                 }
@@ -82,6 +82,16 @@ struct QuizView: View {
                 }
 
                 GlassProgressBar(progress: Double(answeredCount) / Double(max(quizWords.count, 1)))
+            }
+            if answersBlurred {
+                Color.clear
+                    .contentShape(Rectangle())
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        withAnimation(.easeOut(duration: 0.3)) {
+                            answersBlurred = false
+                        }
+                    }
             }
         }
         .onAppear {
