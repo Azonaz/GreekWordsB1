@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @State private var currentLanguage = Locale.current.language.languageCode?.identifier ?? "en"
     @Environment(\.horizontalSizeClass) var sizeClass
+    @AppStorage("isBlurEnabled") private var isBlurEnabled = true
 
     var body: some View {
         ZStack {
@@ -13,22 +14,32 @@ struct SettingsView: View {
                 Button {
                     openAppSettings()
                 } label: {
-                    HStack {
+                    HStack(spacing: 14) {
                         Image(systemName: "globe")
+                            .font(.body)
+                            .imageScale(.large)
                             .foregroundColor(.primary)
 
                         Text(Texts.language)
+                            .font(.body)
                             .foregroundColor(.primary)
 
                         Spacer()
 
                         Text(displayName(for: currentLanguage))
+                            .font(.body)
                             .foregroundColor(.secondary)
 
                         Image(systemName: "chevron.right")
                             .foregroundColor(.primary)
                     }
+                    .padding(.vertical, 8)
                 }
+
+                GlassToggle(
+                    isOn: $isBlurEnabled,
+                    label: isBlurEnabled ? Texts.blurOn : Texts.blurOff
+                )
             }
         }
         .navigationTitle("")

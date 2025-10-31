@@ -15,7 +15,8 @@ struct QuizView: View {
     @State private var correctCount = 0
     @State private var showResult = false
     @State private var isEnglish: Bool = Locale.preferredLanguages.first?.hasPrefix("en") == true
-    @State private var answersBlurred = true
+    @AppStorage("isBlurEnabled") private var isBlurEnabled = true
+    @State private var answersBlurred = false
 
     private var currentWord: Word? {
         quizWords.isEmpty ? nil : quizWords[currentIndex]
@@ -74,11 +75,16 @@ struct QuizView: View {
                     ProgressView()
                 }
             }
-            .contentShape(Rectangle())
-            .onTapGesture {
-                withAnimation(.easeOut(duration: 0.3)) {
-                    answersBlurred = false
-                }
+
+            if answersBlurred {
+                Color.clear
+                    .contentShape(Rectangle())
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        withAnimation(.easeOut(duration: 0.3)) {
+                            answersBlurred = false
+                        }
+                    }
             }
         }
         .onAppear(perform: startQuiz)
@@ -123,7 +129,7 @@ struct QuizView: View {
 
         withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
             options = newOptions
-            answersBlurred = true
+            answersBlurred = isBlurEnabled
         }
     }
 

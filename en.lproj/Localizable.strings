@@ -3,3 +3,5 @@
 "categories" = "Categories";
 "settings" = "Settings";
 "language" = "Language";
+"blurOn" = "Show answers on tap";
+"blurOff" = "Answers visible";
