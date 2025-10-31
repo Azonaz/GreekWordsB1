@@ -8,3 +8,9 @@
 "restart" = "Restart";
 "back" = "Back";
 "result" = "Result";
+"statistics" = "Statistics";
+"allWords" = "Total words";
+"quizzesCompleted" = "Quizzes completed";
+"wordsSeen" = "Words seen";
+"averagePercentage" = "Average percentage";
+"information" = "Information";

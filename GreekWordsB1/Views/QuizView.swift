@@ -5,6 +5,7 @@ struct QuizView: View {
     let group: GroupMeta
     @Query var words: [Word]
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var context
     @Environment(\.horizontalSizeClass) var sizeClass
 
     @State private var quizWords: [Word] = []
@@ -74,7 +75,6 @@ struct QuizView: View {
                                         handleTap(word)
                                     }
                                 }
-                                .transition(.move(edge: .bottom).combined(with: .opacity))
                         }
                     }
                 } else {
@@ -82,17 +82,6 @@ struct QuizView: View {
                 }
 
                 GlassProgressBar(progress: Double(answeredCount) / Double(max(quizWords.count, 1)))
-            }
-
-            if answersBlurred {
-                Color.clear
-                    .contentShape(Rectangle())
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        withAnimation(.easeOut(duration: 0.3)) {
-                            answersBlurred = false
-                        }
-                    }
             }
         }
         .onAppear {
@@ -110,6 +99,11 @@ struct QuizView: View {
                     dismiss()
                 }
             )
+        }
+        .onChange(of: showResult) {
+            if showResult {
+                saveQuizResult()
+            }
         }
         .navigationTitle("")
         .toolbar {
@@ -135,7 +129,6 @@ struct QuizView: View {
 
     private func setupRound() {
         guard let currentWord else { return }
-
         let others = words.filter { $0.compositeID != currentWord.compositeID }.shuffled()
         let newOptions = ([currentWord] + others.prefix(2)).shuffled()
 
@@ -147,17 +140,12 @@ struct QuizView: View {
 
     private func handleTap(_ word: Word) {
         guard selectedWord == nil else { return }
-
         isInteractionDisabled = true
 
         selectedWord = word
         let correct = (word.compositeID == currentWord?.compositeID)
         isCorrect = correct
-        if correct {
-            correctCount += 1
-        } else {
-            shake()
-        }
+        if correct { correctCount += 1 } else { shake() }
 
         haptic.selectionChanged()
         haptic.prepare()
@@ -182,6 +170,36 @@ struct QuizView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 isInteractionDisabled = false
             }
+        }
+    }
+
+    private func saveQuizResult() {
+        let result = Int((Double(correctCount) / Double(quizWords.count)) * 100)
+
+        if let stats = try? context.fetch(FetchDescriptor<QuizStats>()).first {
+            stats.completedCount += 1
+            stats.totalScore += result
+        } else {
+            context.insert(QuizStats(completedCount: 1, totalScore: result))
+        }
+
+        for word in quizWords {
+            let id = word.compositeID
+            let descriptor = FetchDescriptor<WordProgress>(
+                predicate: #Predicate { $0.compositeID == id }
+            )
+
+            if let wordProgress = try? context.fetch(descriptor).first {
+                wordProgress.seen = true
+            } else {
+                context.insert(WordProgress(compositeID: id, seen: true))
+            }
+        }
+
+        do {
+            try context.save()
+        } catch {
+            print("Error saving statistics: \(error)")
         }
     }
 

@@ -8,3 +8,9 @@
 "restart" = "Начать заново";
 "back" = "Назад";
 "result" = "Результат";
+"statistics" = "Статистика";
+"allWords" = "Всего слов";
+"quizzesCompleted" = "Пройдено квизов";
+"wordsSeen" = "Просмотрено слов";
+"averagePercentage" = "Средний процент";
+"information" = "Информация";

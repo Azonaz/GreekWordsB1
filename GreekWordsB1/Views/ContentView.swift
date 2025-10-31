@@ -51,8 +51,8 @@ struct ContentView: View {
                     Spacer()
 
                     HStack(spacing: 24) {
-                        Button {
-                            print("Info tapped")
+                        NavigationLink {
+                            InfoView()
                         } label: {
                             Image(systemName: "info.circle")
                                 .font(.system(size: 24, weight: .regular))
@@ -60,8 +60,8 @@ struct ContentView: View {
                                 .glassCard(height: 55, cornerRadius: 25)
                         }
 
-                        Button {
-                            print("Statistics tapped")
+                        NavigationLink {
+                            StatisticsView()
                         } label: {
                             Image(systemName: "chart.pie")
                                 .font(.system(size: 24, weight: .regular))
@@ -109,5 +109,5 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
-        .modelContainer(for: [Word.self, GroupMeta.self, WordProgress.self])
+        .modelContainer(for: [Word.self, GroupMeta.self, WordProgress.self, QuizStats.self])
 }

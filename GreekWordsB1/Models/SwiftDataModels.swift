@@ -41,10 +41,12 @@ final class WordProgress {
     @Attribute(.unique) var compositeID: String
     var learned: Bool
     var correctAnswers: Int
+    var seen: Bool
 
-    init(compositeID: String, learned: Bool = false, correctAnswers: Int = 0) {
+    init(compositeID: String, learned: Bool = false, correctAnswers: Int = 0, seen: Bool = false) {
         self.compositeID = compositeID
         self.learned = learned
         self.correctAnswers = correctAnswers
+        self.seen = seen
     }
 }
