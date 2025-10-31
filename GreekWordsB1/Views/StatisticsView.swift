@@ -81,7 +81,7 @@ private struct StatCard: View {
                 .foregroundColor(.primary)
         }
         .frame(maxWidth: .infinity)
-        .glassCard(height: height, cornerRadius: cornerRadius)
+        .glassLabel(height: height, cornerRadius: cornerRadius)
     }
 }
 

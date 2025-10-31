@@ -6,6 +6,22 @@ struct InfoView: View {
     var body: some View {
         ZStack {
             Color.gray.opacity(0.05).ignoresSafeArea()
+
+            List {
+                Section(header:
+                    Text(Texts.quizInfo)
+                        .font(sizeClass == .regular ? .title2 : .headline)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+                        .padding(.bottom, 4)
+                ) {
+                    Text(Texts.quizHelp)
+                        .font(.body)
+                        .multilineTextAlignment(.leading)
+                        .padding(.vertical, 4)
+                }
+            }
+            .listStyle(.insetGrouped)
         }
         .navigationTitle("")
         .toolbar {

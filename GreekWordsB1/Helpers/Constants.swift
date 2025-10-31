@@ -13,6 +13,8 @@ enum Texts {
     static let back: LocalizedStringKey = "back"
     static let result: LocalizedStringKey = "result"
     static let information: LocalizedStringKey = "information"
+    static let quizInfo: LocalizedStringKey = "quizInfo"
+    static let quizHelp: LocalizedStringKey = "quizHelp"
 
     static var allWords: String {
         NSLocalizedString("allWords", comment: "")
