@@ -19,7 +19,7 @@ struct ContentView: View {
     }
 
     private var cornerRadius: CGFloat {
-        sizeClass == .regular ? 30 : 20
+        sizeClass == .regular ? 40 : 30
     }
 
     var body: some View {

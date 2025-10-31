@@ -8,6 +8,9 @@ enum Texts {
     static let categories: LocalizedStringKey = "categories"
     static let settings: LocalizedStringKey = "settings"
     static let language: LocalizedStringKey = "language"
+    static let restart: LocalizedStringKey = "restart"
+    static let back: LocalizedStringKey = "back"
+    static let result: LocalizedStringKey = "result"
 
     static var blurOn: String {
         NSLocalizedString("blurOn", comment: "")

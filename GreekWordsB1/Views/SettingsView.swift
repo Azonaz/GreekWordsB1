@@ -3,7 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @State private var currentLanguage = Locale.current.language.languageCode?.identifier ?? "en"
     @Environment(\.horizontalSizeClass) var sizeClass
-    @AppStorage("isBlurEnabled") private var isBlurEnabled = true
+    @AppStorage("isBlurEnabled") private var isBlurEnabled = false
 
     var body: some View {
         ZStack {

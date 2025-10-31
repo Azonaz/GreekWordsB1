@@ -19,6 +19,8 @@ struct QuizView: View {
     @State private var answersBlurred = false
     @State private var haptic = UISelectionFeedbackGenerator()
     @State private var shakeOffset: CGFloat = 0
+    @State private var answeredCount = 0
+    @State private var isInteractionDisabled = false
 
     private var currentWord: Word? {
         quizWords.isEmpty ? nil : quizWords[currentIndex]
@@ -68,7 +70,7 @@ struct QuizView: View {
                                 )
                                 .padding(.horizontal, paddingHorizontal)
                                 .onTapGesture {
-                                    if !answersBlurred {
+                                    if !answersBlurred && !isInteractionDisabled {
                                         handleTap(word)
                                     }
                                 }
@@ -78,6 +80,8 @@ struct QuizView: View {
                 } else {
                     ProgressView()
                 }
+
+                GlassProgressBar(progress: Double(answeredCount) / Double(max(quizWords.count, 1)))
             }
 
             if answersBlurred {
@@ -97,12 +101,12 @@ struct QuizView: View {
         }
         .alert(isPresented: $showResult) {
             Alert(
-                title: Text("Result"),
+                title: Text(Texts.result),
                 message: Text("\(correctCount)/\(quizWords.count)"),
-                primaryButton: .default(Text("Restart")) {
+                primaryButton: .default(Text(Texts.restart)) {
                     startQuiz()
                 },
-                secondaryButton: .cancel(Text("Back")) {
+                secondaryButton: .cancel(Text(Texts.back)) {
                     dismiss()
                 }
             )
@@ -122,6 +126,7 @@ struct QuizView: View {
         quizWords = Array(words.shuffled().prefix(10))
         currentIndex = 0
         correctCount = 0
+        answeredCount = 0
         selectedWord = nil
         isCorrect = nil
         showResult = false
@@ -143,6 +148,8 @@ struct QuizView: View {
     private func handleTap(_ word: Word) {
         guard selectedWord == nil else { return }
 
+        isInteractionDisabled = true
+
         selectedWord = word
         let correct = (word.compositeID == currentWord?.compositeID)
         isCorrect = correct
@@ -155,6 +162,10 @@ struct QuizView: View {
         haptic.selectionChanged()
         haptic.prepare()
 
+        withAnimation(.easeInOut(duration: 0.35)) {
+            answeredCount += 1
+        }
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             withAnimation {
                 selectedWord = nil
@@ -166,6 +177,10 @@ struct QuizView: View {
                 } else {
                     showResult = true
                 }
+            }
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                isInteractionDisabled = false
             }
         }
     }

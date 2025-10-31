@@ -5,3 +5,6 @@
 "language" = "Language";
 "blurOn" = "Show answers on tap";
 "blurOff" = "Answers visible";
+"restart" = "Restart";
+"back" = "Back";
+"result" = "Result";
