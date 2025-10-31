@@ -17,6 +17,8 @@ struct QuizView: View {
     @State private var isEnglish: Bool = Locale.preferredLanguages.first?.hasPrefix("en") == true
     @AppStorage("isBlurEnabled") private var isBlurEnabled = true
     @State private var answersBlurred = false
+    @State private var haptic = UISelectionFeedbackGenerator()
+    @State private var shakeOffset: CGFloat = 0
 
     private var currentWord: Word? {
         quizWords.isEmpty ? nil : quizWords[currentIndex]
@@ -52,6 +54,8 @@ struct QuizView: View {
                     VStack(spacing: 20) {
                         ForEach(options, id: \.compositeID) { word in
                             Text(isEnglish ? word.en : word.ru)
+                                .offset(x: (isCorrect == false && word.compositeID ==
+                                            selectedWord?.compositeID) ? shakeOffset : 0)
                                 .font(.title3)
                                 .foregroundColor(.primary)
                                 .blur(radius: answersBlurred ? 8 : 0)
@@ -87,7 +91,10 @@ struct QuizView: View {
                     }
             }
         }
-        .onAppear(perform: startQuiz)
+        .onAppear {
+            haptic.prepare()
+            startQuiz()
+        }
         .alert(isPresented: $showResult) {
             Alert(
                 title: Text("Result"),
@@ -139,7 +146,14 @@ struct QuizView: View {
         selectedWord = word
         let correct = (word.compositeID == currentWord?.compositeID)
         isCorrect = correct
-        if correct { correctCount += 1 }
+        if correct {
+            correctCount += 1
+        } else {
+            shake()
+        }
+
+        haptic.selectionChanged()
+        haptic.prepare()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             withAnimation {
@@ -160,8 +174,24 @@ struct QuizView: View {
         guard let selectedWord else { return nil }
         if word.compositeID != selectedWord.compositeID { return nil }
         return isCorrect == true
-            ? [.green.opacity(0.4), .green.opacity(0.7), .green.opacity(0.4)]
-            : [.red.opacity(0.4), .red.opacity(0.8), .red.opacity(0.4)]
+        ? [.green.opacity(0.4), .green.opacity(0.7), .green.opacity(0.4)]
+        : [.red.opacity(0.4), .red.opacity(0.8), .red.opacity(0.4)]
+    }
+
+    private func shake() {
+        let amplitude: CGFloat = 8
+        withAnimation(.default.speed(3)) {
+            shakeOffset = amplitude
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            withAnimation(.default.speed(3)) { shakeOffset = -amplitude }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            withAnimation(.default.speed(3)) { shakeOffset = amplitude / 2 }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+            withAnimation(.default.speed(3)) { shakeOffset = 0 }
+        }
     }
 }
 
