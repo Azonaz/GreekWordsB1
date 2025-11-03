@@ -1,5 +1,6 @@
 "quiz" = "Quiz";
-"soon" = "Soon: Study";
+"training" = "Training";
+"soon" = "Coming soon";
 "categories" = "Categories";
 "settings" = "Settings";
 "language" = "Language";
@@ -14,8 +15,14 @@
 "wordsSeen" = "Words seen";
 "averagePercentage" = "Average percentage";
 "information" = "Information";
-"quizInfo" = "Quiz Information";
+"quizInfo" = "Quiz Mode";
 "quizHelp" = "The Quiz section lets you test your knowledge of Greek words in an interactive way.
 Each round has 10 questions.
 In the Settings section, you can select your preferred language or enable blur mode to hide answers until you tap the screen.
 You can see your quiz statistics and progress in the Statistics section.";
+"trainingInfo" = "Training Mode";
+"trainingHelp" = "The Training section is currently under development.
+It will be a modern spaced-repetition mode inspired by Anki, designed to help you remember words more effectively.
+You’ll be able to study at your own pace, revisiting words you’ve already encountered in quizzes.
+The app will automatically choose which words to review next, so you can build long-term memory naturally.
+This mode will help you track progress, focus on difficult words, and gradually strengthen your vocabulary.";

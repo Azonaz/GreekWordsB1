@@ -4,6 +4,7 @@ let baseURL = "https://azonaz.github.io/words-gr-b1.json"
 
 enum Texts {
     static let quiz: LocalizedStringKey = "quiz"
+    static let training: LocalizedStringKey = "training"
     static let soon: LocalizedStringKey = "soon"
     static let categories: LocalizedStringKey = "categories"
     static let settings: LocalizedStringKey = "settings"
@@ -15,6 +16,8 @@ enum Texts {
     static let information: LocalizedStringKey = "information"
     static let quizInfo: LocalizedStringKey = "quizInfo"
     static let quizHelp: LocalizedStringKey = "quizHelp"
+    static let trainingInfo: LocalizedStringKey = "trainingInfo"
+    static let trainingHelp: LocalizedStringKey = "trainingHelp"
 
     static var allWords: String {
         NSLocalizedString("allWords", comment: "")
