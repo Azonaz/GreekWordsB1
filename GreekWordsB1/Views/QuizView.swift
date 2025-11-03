@@ -7,6 +7,7 @@ struct QuizView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
     @Environment(\.horizontalSizeClass) var sizeClass
+    @Environment(\.verticalSizeClass) var vSizeClass
 
     @State private var quizWords: [Word] = []
     @State private var currentIndex = 0
@@ -45,44 +46,11 @@ struct QuizView: View {
         ZStack {
             Color.gray.opacity(0.05).ignoresSafeArea()
 
-            VStack(spacing: 100) {
-                if let currentWord {
-                    Text(currentWord.gr)
-                        .font(.largeTitle.bold())
-                        .multilineTextAlignment(.center)
-                        .padding()
-                        .glassCard(height: sizeClass == .regular ? 140 : 120, cornerRadius: cornerRadius)
-                        .padding(.horizontal, paddingHorizontal)
-
-                    VStack(spacing: 20) {
-                        ForEach(options, id: \.compositeID) { word in
-                            Text(isEnglish ? word.en : word.ru)
-                                .offset(x: (isCorrect == false && word.compositeID ==
-                                            selectedWord?.compositeID) ? shakeOffset : 0)
-                                .font(.title3)
-                                .foregroundColor(.primary)
-                                .blur(radius: answersBlurred ? 8 : 0)
-                                .opacity(answersBlurred ? 0.9 : 1)
-                                .animation(.easeInOut(duration: 0.3), value: answersBlurred)
-                                .glassCard(
-                                    height: sizeClass == .regular ? 80 : 60,
-                                    cornerRadius: cornerRadius,
-                                    highlightColors: highlightColors(for: word)
-                                )
-                                .padding(.horizontal, paddingHorizontal)
-                                .onTapGesture {
-                                    if !isInteractionDisabled {
-                                        handleTap(word)
-                                    }
-                                }
-                        }
-                    }
-                } else {
-                    ProgressView()
-                }
-
+            VStack(spacing: vSizeClass == .compact ? 20 : 100) {
+                quizContent
                 GlassProgressBar(progress: Double(answeredCount) / Double(max(quizWords.count, 1)))
             }
+
             if answersBlurred {
                 Color.clear
                     .contentShape(Rectangle())
@@ -102,19 +70,11 @@ struct QuizView: View {
             Alert(
                 title: Text(Texts.result),
                 message: Text("\(correctCount)/\(quizWords.count)"),
-                primaryButton: .default(Text(Texts.restart)) {
-                    startQuiz()
-                },
-                secondaryButton: .cancel(Text(Texts.back)) {
-                    dismiss()
-                }
+                primaryButton: .default(Text(Texts.restart)) { startQuiz() },
+                secondaryButton: .cancel(Text(Texts.back)) { dismiss() }
             )
         }
-        .onChange(of: showResult) {
-            if showResult {
-                saveQuizResult()
-            }
-        }
+        .onChange(of: showResult) { if showResult { saveQuizResult() } }
         .navigationTitle("")
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -123,6 +83,74 @@ struct QuizView: View {
                     .foregroundColor(.primary)
             }
         }
+    }
+
+    @ViewBuilder
+    private var quizContent: some View {
+        if let currentWord {
+            if sizeClass == .compact && vSizeClass == .compact {
+                // landscape mode for phone
+                GeometryReader { geo in
+                    HStack(spacing: 16) {
+                        Text(currentWord.gr)
+                            .font(.largeTitle.bold())
+                            .multilineTextAlignment(.center)
+                            .padding()
+                            .glassCard(height: 120, cornerRadius: cornerRadius)
+                            .frame(width: geo.size.width * 0.4)
+
+                        VStack(spacing: 16) {
+                            ForEach(options, id: \.compositeID) { word in
+                                answerView(for: word, height: 60)
+                                    .frame(width: geo.size.width * 0.6)
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(.horizontal, 16)
+                }
+                .frame(height: 220)
+            } else {
+                // portrait mode
+                VStack(spacing: 20) {
+                    Text(currentWord.gr)
+                        .font(.largeTitle.bold())
+                        .multilineTextAlignment(.center)
+                        .padding()
+                        .glassCard(height: sizeClass == .regular ? 140 : 120, cornerRadius: cornerRadius)
+                        .padding(.horizontal, paddingHorizontal)
+                        .padding(.bottom, sizeClass == .regular ? 100 : 80)
+
+                    ForEach(options, id: \.compositeID) { word in
+                        answerView(for: word, height: sizeClass == .regular ? 80 : 60)
+                    }
+                }
+            }
+        } else {
+            ProgressView()
+        }
+    }
+
+    @ViewBuilder
+    private func answerView(for word: Word, height: CGFloat) -> some View {
+        Text(isEnglish ? word.en : word.ru)
+            .offset(x: (isCorrect == false && word.compositeID == selectedWord?.compositeID) ? shakeOffset : 0)
+            .font(.title3)
+            .foregroundColor(.primary)
+            .blur(radius: answersBlurred ? 8 : 0)
+            .opacity(answersBlurred ? 0.9 : 1)
+            .animation(.easeInOut(duration: 0.3), value: answersBlurred)
+            .glassCard(
+                height: height,
+                cornerRadius: cornerRadius,
+                highlightColors: highlightColors(for: word)
+            )
+            .padding(.horizontal, paddingHorizontal)
+            .onTapGesture {
+                if !isInteractionDisabled {
+                    handleTap(word)
+                }
+            }
     }
 
     private func startQuiz() {
