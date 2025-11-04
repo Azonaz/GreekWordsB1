@@ -6,6 +6,7 @@ struct ContentView: View {
     @State private var showCategories = false
     @Environment(\.horizontalSizeClass) var sizeClass
     @Environment(\.colorScheme) var colorScheme
+    @Environment(\.scenePhase) private var scenePhase
 
     private var buttonHeight: CGFloat {
         sizeClass == .regular ? 100 : 80
@@ -138,6 +139,12 @@ struct ContentView: View {
             )
             .task {
                 await syncVocabulary()
+                _ = try? context.fetch(FetchDescriptor<GroupMeta>())
+            }
+            .onChange(of: scenePhase) {
+                if scenePhase == .active {
+                    Task { await syncVocabulary() }
+                }
             }
         }
     }

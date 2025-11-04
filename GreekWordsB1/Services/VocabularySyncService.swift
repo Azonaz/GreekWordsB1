@@ -4,7 +4,6 @@ import SwiftData
 final class VocabularySyncService {
     private let context: ModelContext
     private let remoteURL: URL
-    private(set) var dictionaryUrl = "https://azonaz.github.io/words-gr-b1.json"
 
     init(context: ModelContext, remoteURL: URL) {
         self.context = context

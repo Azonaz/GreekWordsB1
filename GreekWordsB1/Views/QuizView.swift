@@ -29,7 +29,7 @@ struct QuizView: View {
     }
 
     private var paddingHorizontal: CGFloat {
-        sizeClass == .regular ? 100 : 60
+        sizeClass == .regular ? 48 : 24
     }
 
     private var cornerRadius: CGFloat {

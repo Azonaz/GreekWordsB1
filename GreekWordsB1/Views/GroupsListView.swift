@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct GroupsListView: View {
-    @Query(sort: \GroupMeta.nameEn) private var groups: [GroupMeta]
+    @Query(sort: [SortDescriptor(\GroupMeta.id, order: .forward)]) private var groups: [GroupMeta]
     @Environment(\.horizontalSizeClass) var sizeClass
     @Environment(\.dismiss) private var dismiss
 

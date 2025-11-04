@@ -6,7 +6,7 @@ struct GlassProgressBar: View {
     @Environment(\.horizontalSizeClass) var sizeClass
 
     private var paddingHorizontal: CGFloat {
-        sizeClass == .regular ? 100 : 60
+        sizeClass == .regular ? 48 : 24
     }
 
     var body: some View {
