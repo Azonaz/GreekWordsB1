@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		847316FA2EBCB9A800DE3038 /* FSRS in Frameworks */ = {isa = PBXBuildFile; productRef = 847316F92EBCB9A800DE3038 /* FSRS */; };
 		847EF0162EB2660700B068B2 /* Localizable.strings in Sources */ = {isa = PBXBuildFile; fileRef = 847EF0152EB2660700B068B2 /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
@@ -58,6 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				847316FA2EBCB9A800DE3038 /* FSRS in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -120,6 +122,7 @@
 			);
 			name = GreekWordsB1;
 			packageProductDependencies = (
+				847316F92EBCB9A800DE3038 /* FSRS */,
 			);
 			productName = GreekWordsB1;
 			productReference = 84F3501F2EAF7CEA00E9C8C9 /* GreekWordsB1.app */;
@@ -204,6 +207,9 @@
 			);
 			mainGroup = 84F350162EAF7CEA00E9C8C9;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				847316F82EBCB9A800DE3038 /* XCRemoteSwiftPackageReference "swift-fsrs" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 84F350202EAF7CEA00E9C8C9 /* Products */;
 			projectDirPath = "";
@@ -629,6 +635,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		847316F82EBCB9A800DE3038 /* XCRemoteSwiftPackageReference "swift-fsrs" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/open-spaced-repetition/swift-fsrs";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		847316F92EBCB9A800DE3038 /* FSRS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 847316F82EBCB9A800DE3038 /* XCRemoteSwiftPackageReference "swift-fsrs" */;
+			productName = FSRS;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 84F350172EAF7CEA00E9C8C9 /* Project object */;
 }
