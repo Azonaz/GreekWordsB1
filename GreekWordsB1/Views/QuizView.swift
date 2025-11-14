@@ -64,6 +64,7 @@ struct QuizView: View {
         }
         .onAppear {
             haptic.prepare()
+            markGroupAsOpened()
             startQuiz()
         }
         .alert(isPresented: $showResult) {
@@ -155,6 +156,17 @@ struct QuizView: View {
                     handleTap(word)
                 }
             }
+    }
+
+    private func markGroupAsOpened() {
+        if !group.opened {
+            group.opened = true
+            do {
+                try context.save()
+            } catch {
+                print("Error when saving the opened-flag: \(error)")
+            }
+        }
     }
 
     private func startQuiz() {
