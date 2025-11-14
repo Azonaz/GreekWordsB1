@@ -2,87 +2,145 @@ import SwiftUI
 import SwiftData
 import FSRS
 
+enum ReviewState {
+    case new
+    case review
+}
+
 struct TrainingView: View {
     @Environment(\.modelContext) private var context
+    @Environment(\.horizontalSizeClass) var sizeClass
 
+    @State private var isEnglish: Bool = Locale.preferredLanguages.first?.hasPrefix("en") == true
     @State private var dueWords: [Word] = []
     @State private var currentIndex = 0
     @State private var showTranslation = false
     @State private var finished = false
-    @State private var todayTotal = 0
+    @State private var noGroups = false
     @State private var todayNew = 0
     @State private var todayReview = 0
+    @State private var wordStates: [String: ReviewState] = [:]
+
+    private var todayTotal: Int {
+        max(dueWords.count - currentIndex, 0)
+    }
+
+    private var buttonHeight: CGFloat {
+        sizeClass == .regular ? 100 : 80
+    }
+
+    private var cornerRadius: CGFloat {
+        sizeClass == .regular ? 40 : 30
+    }
 
     private let scheduler = TrainingScheduler()
 
     var body: some View {
-        VStack {
-            if finished {
-                Text("All words for today have been reviewed!")
-                    .font(.title2)
-                    .padding()
-            } else if let word = dueWords[safe: currentIndex] {
-                VStack(spacing: 40) {
-                    if !dueWords.isEmpty {
-                        VStack(spacing: 8) {
-                            Text("Today: \(todayTotal) words")
-                                .font(.headline)
+        ZStack {
+            Color.gray.opacity(0.05).ignoresSafeArea()
 
-                            HStack(spacing: 12) {
-                                Text("New: \(todayNew)")
-                                Text("Review: \(todayReview)")
-                            }
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                        }
-                        .padding(.top, 12)
-                    }
+            VStack {
+                if noGroups {
+                    Text("Нет открытых групп")
+                        .font(.title2)
+                        .glassLabel(height: sizeClass == .regular ? 90 : 70,
+                                    cornerRadius: sizeClass == .regular ? 30 : 20)
+                        .padding(.horizontal, 24)
+                } else if finished {
+                    Text("Все слова за сегодня пройдены!")
+                        .font(.title2)
+                        .glassLabel(height: sizeClass == .regular ? 90 : 70,
+                                    cornerRadius: sizeClass == .regular ? 30 : 20)
+                        .padding(.horizontal, 24)
+                } else if let word = dueWords[safe: currentIndex] {
+                    VStack(spacing: 40) {
+                        if !dueWords.isEmpty {
+                            VStack(spacing: 8) {
+                                Text("Today: \(todayTotal) words")
+                                    .font(.headline)
 
-                    Text(word.gr)
-                        .font(.system(size: 44, weight: .bold))
-                        .padding(.top, 60)
-
-                    if showTranslation {
-                        VStack(spacing: 12) {
-                            Text(word.en)
-                                .font(.title3)
-                            Text(word.ru)
-                                .font(.title3)
-                                .foregroundColor(.secondary)
-                        }
-                        .transition(.opacity)
-                    }
-
-                    Spacer()
-
-                    if showTranslation {
-                        HStack(spacing: 16) {
-                            ForEach(Rating.allCases.filter { $0 != .manual }, id: \.self) { rating in
-                                Button(rating.stringValue.capitalized) {
-                                    Task { await handleRating(rating, for: word) }
+                                HStack(spacing: 12) {
+                                    Text("New: \(todayNew)")
+                                    Text("Review: \(todayReview)")
                                 }
-                                .buttonStyle(.borderedProminent)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
                             }
+                            .frame(maxWidth: .infinity)
+                            .glassLabel(height: sizeClass == .regular ? 90 : 70,
+                                        cornerRadius: sizeClass == .regular ? 30 : 20)
+                            .padding(.top, 12)
+                            .padding(.horizontal, 24)
                         }
-                        .padding(.bottom, 40)
-                    } else {
-                        Button("Show translation") {
-                            withAnimation { showTranslation = true }
+
+                        Text(word.gr)
+                            .font(.largeTitle.bold())
+                            .multilineTextAlignment(.center)
+                            .padding()
+                            .glassCard(height: 120, cornerRadius: 30)
+                            .padding(.horizontal, 24)
+                            .padding(.top, 40)
+
+                        if showTranslation {
+                            Text(isEnglish ? word.en : word.ru)
+                                .font(sizeClass == .regular ? .largeTitle : .title2)
+                                .foregroundColor(.primary)
+                                .transition(.opacity)
                         }
-                        .buttonStyle(.borderedProminent)
-                        .padding(.bottom, 40)
+
+                        Spacer()
+
+                        if showTranslation {
+                            HStack(spacing: 12) {
+                                ForEach(Rating.allCases.filter { $0 != .manual }, id: \.self) { rating in
+                                    Button {
+                                        Task { await handleRating(rating, for: word) }
+                                    } label: {
+                                        Text(rating.stringValue.capitalized)
+                                            .font(.body)
+                                            .foregroundColor(.primary)
+                                            .frame(maxWidth: .infinity)
+                                            .glassCard(height: sizeClass == .regular ? 55 : 35,
+                                                       cornerRadius: sizeClass == .regular ? 25 : 15)
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.bottom, 40)
+                        } else {
+                            Button {
+                                withAnimation { showTranslation = true }
+                            } label: {
+                                Text(Texts.showTranslation)
+                                    .font(sizeClass == .regular ? .title : .title2)
+                                    .multilineTextAlignment(.center)
+                                    .foregroundColor(.primary)
+                                    .padding()
+                                    .frame(maxWidth: .infinity)
+                                    .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
+                            }
+                            .padding(.horizontal, 24)
+                            .padding(.bottom, 40)
+                        }
                     }
+                    .padding()
+                    .animation(.easeInOut, value: showTranslation)
+                } else {
+                    ProgressView()
                 }
-                .padding()
-                .animation(.easeInOut, value: showTranslation)
-            } else {
-                ProgressView()
             }
         }
         .task {
             await loadDueWords()
         }
-        .navigationTitle(Texts.training)
+        .navigationTitle("")
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(Texts.training)
+                    .font(sizeClass == .regular ? .largeTitle : .title2)
+                    .foregroundColor(.primary)
+            }
+        }
     }
 
     // Loading words
@@ -96,10 +154,9 @@ struct TrainingView: View {
             // No open groups — exit
             guard !openIDs.isEmpty else {
                 await MainActor.run {
+                    self.noGroups = true
+                    self.finished = false
                     self.dueWords = []
-                    self.currentIndex = 0
-                    self.showTranslation = false
-                    self.finished = true
                 }
                 return
             }
@@ -140,6 +197,10 @@ struct TrainingView: View {
             let newCount = todaysProgresses.filter { $0.state == .new }.count
             let totalCount = todaysProgresses.count
             let reviewCount = totalCount - newCount
+            wordStates = Dictionary(uniqueKeysWithValues: todaysProgresses.map { progress in
+                let state: ReviewState = (progress.state == .new ? .new : .review)
+                return (progress.compositeID, state)
+            })
 
             // Convert progress → words
             dueWords = todaysProgresses.compactMap { progress in
@@ -152,7 +213,6 @@ struct TrainingView: View {
                 currentIndex = 0
                 showTranslation = false
                 finished = dueWords.isEmpty
-                todayTotal = totalCount
                 todayNew = newCount
                 todayReview = reviewCount
             }
@@ -177,6 +237,15 @@ struct TrainingView: View {
                     showTranslation = false
                 } else {
                     finished = true
+                }
+
+                if let state = wordStates[word.compositeID] {
+                    switch state {
+                    case .new:
+                        todayNew -= 1
+                    case .review:
+                        todayReview -= 1
+                    }
                 }
             }
 
