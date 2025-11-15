@@ -10,6 +10,7 @@ enum ReviewState {
 struct TrainingView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.horizontalSizeClass) var sizeClass
+    @Environment(\.verticalSizeClass) var vSizeClass
 
     @State private var isEnglish: Bool = Locale.preferredLanguages.first?.hasPrefix("en") == true
     @State private var dueWords: [Word] = []
@@ -31,6 +32,10 @@ struct TrainingView: View {
 
     private var cornerRadius: CGFloat {
         sizeClass == .regular ? 40 : 30
+    }
+
+    private var isPhoneLandscape: Bool {
+        UIDevice.current.userInterfaceIdiom == .phone && vSizeClass == .compact
     }
 
     private let scheduler = TrainingScheduler()
@@ -59,84 +64,11 @@ struct TrainingView: View {
                                     cornerRadius: sizeClass == .regular ? 30 : 20)
                         .padding(.horizontal, 16)
                 } else if let word = dueWords[safe: currentIndex] {
-                    VStack(spacing: 40) {
-                        if !dueWords.isEmpty {
-                            VStack(spacing: 8) {
-                                Text(Texts.wordsToday) + Text(" \(todayTotal)")
-                                    .font(.headline)
-
-                                HStack(spacing: 12) {
-                                    Text(Texts.new) + Text(" \(todayNew)")
-                                    Text(Texts.review) + Text(" \(todayReview)")
-                                }
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .glassLabel(height: sizeClass == .regular ? 90 : 70,
-                                        cornerRadius: sizeClass == .regular ? 30 : 20)
-                            .padding(.top, 12)
-                            .padding(.horizontal, 16)
-                        }
-
-                        Text(word.gr)
-                            .font(.largeTitle.bold())
-                            .multilineTextAlignment(.center)
-                            .lineLimit(nil)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .padding()
-                            .glassCard(height: sizeClass == .regular ? 140 : 120, cornerRadius: cornerRadius)
-                            .padding(.horizontal, 16)
-                            .padding(.top, 40)
-
-                        if showTranslation {
-                            Text(isEnglish ? word.en : word.ru)
-                                .font(.largeTitle)
-                                .foregroundColor(.primary)
-                                .multilineTextAlignment(.center)
-                                .lineLimit(nil)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .transition(.opacity)
-                                .padding(.horizontal, 16)
-                        }
-
-                        Spacer()
-
-                        if showTranslation {
-                            HStack(spacing: 12) {
-                                ForEach(Rating.allCases.filter { $0 != .manual }, id: \.self) { rating in
-                                    Button {
-                                        Task { await handleRating(rating, for: word) }
-                                    } label: {
-                                        Text(rating.localized)
-                                            .font(.body)
-                                            .foregroundColor(.primary)
-                                            .frame(maxWidth: .infinity)
-                                            .glassCard(height: sizeClass == .regular ? 55 : 35,
-                                                       cornerRadius: sizeClass == .regular ? 25 : 15)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal, 8)
-                            .padding(.bottom, 40)
-                        } else {
-                            Button {
-                                withAnimation { showTranslation = true }
-                            } label: {
-                                Text(Texts.showTranslation)
-                                    .font(sizeClass == .regular ? .title : .title2)
-                                    .multilineTextAlignment(.center)
-                                    .foregroundColor(.primary)
-                                    .padding()
-                                    .frame(maxWidth: .infinity)
-                                    .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.bottom, 40)
-                        }
+                    if isPhoneLandscape {
+                        landscapePhoneLayout(word)
+                    } else {
+                        portraitLayout(word)
                     }
-                    .padding()
-                    .animation(.easeInOut, value: showTranslation)
                 } else {
                     ProgressView()
                 }
@@ -153,6 +85,167 @@ struct TrainingView: View {
                     .foregroundColor(.primary)
             }
         }
+    }
+
+    @ViewBuilder
+    private func portraitLayout(_ word: Word) -> some View {
+        VStack(spacing: 40) {
+
+            if !dueWords.isEmpty {
+                VStack(spacing: 8) {
+                    Text(Texts.wordsToday) + Text(" \(todayTotal)")
+                        .font(.headline)
+
+                    HStack(spacing: 12) {
+                        Text(Texts.new) + Text(" \(todayNew)")
+                        Text(Texts.review) + Text(" \(todayReview)")
+                    }
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .glassLabel(height: sizeClass == .regular ? 90 : 70,
+                            cornerRadius: sizeClass == .regular ? 30 : 20)
+                .padding(.top, 12)
+                .padding(.horizontal, 16)
+            }
+
+            Text(word.gr)
+                .font(.largeTitle.bold())
+                .multilineTextAlignment(.center)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding()
+                .glassCard(height: sizeClass == .regular ? 140 : 120,
+                           cornerRadius: cornerRadius)
+                .padding(.horizontal, 16)
+                .padding(.top, 40)
+
+            if showTranslation {
+                Text(isEnglish ? word.en : word.ru)
+                    .font(.largeTitle)
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .transition(.opacity)
+                    .padding(.horizontal, 16)
+//                    .animation(.easeInOut, value: showTranslation)
+            }
+
+            Spacer()
+
+            if showTranslation {
+                HStack(spacing: 12) {
+                    ForEach(Rating.allCases.filter { $0 != .manual }, id: \.self) { rating in
+                        Button {
+                            Task { await handleRating(rating, for: word) }
+                        } label: {
+                            Text(rating.localized)
+                                .font(.body)
+                                .foregroundColor(.primary)
+                                .frame(maxWidth: .infinity)
+                                .glassCard(height: sizeClass == .regular ? 55 : 35,
+                                           cornerRadius: sizeClass == .regular ? 25 : 15)
+                        }
+                    }
+                }
+                .padding(.horizontal, 8)
+                .padding(.bottom, 40)
+
+            } else {
+                Button {
+                    withAnimation { showTranslation = true }
+                } label: {
+                    Text(Texts.showTranslation)
+                        .font(sizeClass == .regular ? .title : .title2)
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(.primary)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .glassCard(height: buttonHeight,
+                                   cornerRadius: cornerRadius)
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 40)
+            }
+        }
+        .padding()
+    }
+
+    @ViewBuilder
+    private func landscapePhoneLayout(_ word: Word) -> some View {
+        if !dueWords.isEmpty {
+            HStack(spacing: 24) {
+                Text(Texts.wordsToday) + Text(" \(todayTotal)")
+                    .font(.headline)
+
+                Text(Texts.new) + Text(" \(todayNew)")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+
+                Text(Texts.review) + Text(" \(todayReview)")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            .frame(maxWidth: .infinity)
+            .glassLabel(height: 55, cornerRadius: 20)
+            .padding(.horizontal, 120)
+            .padding(.top, 4)
+        }
+
+        Spacer()
+
+        HStack(spacing: 20) {
+            VStack(spacing: 12) {
+                Text(word.gr)
+                    .font(.largeTitle.bold())
+                    .multilineTextAlignment(.center)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding()
+                    .glassCard(height: 100, cornerRadius: cornerRadius)
+
+                if showTranslation {
+                    Text(isEnglish ? word.en : word.ru)
+                        .font(.largeTitle)
+                        .multilineTextAlignment(.center)
+                        .transition(.opacity)
+                }
+            }
+            .padding(.leading, 24)
+            .frame(maxWidth: .infinity)
+
+            VStack(spacing: 12) {
+                if showTranslation {
+                    ForEach(Rating.allCases.filter { $0 != .manual }, id: \.self) { rating in
+                        Button {
+                            Task { await handleRating(rating, for: word) }
+                        } label: {
+                            Text(rating.localized)
+                                .font(.body)
+                                .foregroundColor(.primary)
+                                .frame(maxWidth: .infinity)
+                                .glassCard(height: 45, cornerRadius: 20)
+                        }
+                    }
+                } else {
+                    Button {
+                        withAnimation { showTranslation = true }
+                    } label: {
+                        Text(Texts.showTranslation)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.primary)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .glassCard(height: 100, cornerRadius: cornerRadius)
+                    }
+                }
+            }
+            .padding(.trailing, 24)
+        }
+
+        Spacer()
     }
 
     // Loading words
