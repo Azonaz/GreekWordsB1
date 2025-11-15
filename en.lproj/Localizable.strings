@@ -27,3 +27,13 @@ You’ll be able to study at your own pace, revisiting words you’ve already en
 The app will automatically choose which words to review next, so you can build long-term memory naturally.
 This mode will help you track progress, focus on difficult words, and gradually strengthen your vocabulary.";
 "showTranslation" = "Show translation";
+"wordsDone" = "All the words for today are done!";
+"noOpenGroups" = "You don't have any open groups yet. 
+To open a group, complete at least one topic in the Quiz section.";
+"wordsToday" = "Words for today:";
+"new" = "New:";
+"review" = "Review:";
+"rating.again"  = "Again";
+"rating.hard"   = "Hard";
+"rating.good"   = "Good";
+"rating.easy"   = "Easy";

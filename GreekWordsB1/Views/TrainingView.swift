@@ -41,27 +41,33 @@ struct TrainingView: View {
 
             VStack {
                 if noGroups {
-                    Text("Нет открытых групп")
-                        .font(.title2)
-                        .glassLabel(height: sizeClass == .regular ? 90 : 70,
-                                    cornerRadius: sizeClass == .regular ? 30 : 20)
-                        .padding(.horizontal, 24)
+                    Text(Texts.noOpenGroups)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding()
+                        .glassLabel(height: sizeClass == .regular ? 140 : 120,
+                                    cornerRadius: cornerRadius)
+                        .padding(.horizontal, 16)
                 } else if finished {
-                    Text("Все слова за сегодня пройдены!")
-                        .font(.title2)
+                    Text(Texts.wordsDone)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding()
                         .glassLabel(height: sizeClass == .regular ? 90 : 70,
                                     cornerRadius: sizeClass == .regular ? 30 : 20)
-                        .padding(.horizontal, 24)
+                        .padding(.horizontal, 16)
                 } else if let word = dueWords[safe: currentIndex] {
                     VStack(spacing: 40) {
                         if !dueWords.isEmpty {
                             VStack(spacing: 8) {
-                                Text("Today: \(todayTotal) words")
+                                Text(Texts.wordsToday) + Text(" \(todayTotal)")
                                     .font(.headline)
 
                                 HStack(spacing: 12) {
-                                    Text("New: \(todayNew)")
-                                    Text("Review: \(todayReview)")
+                                    Text(Texts.new) + Text(" \(todayNew)")
+                                    Text(Texts.review) + Text(" \(todayReview)")
                                 }
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
@@ -70,22 +76,28 @@ struct TrainingView: View {
                             .glassLabel(height: sizeClass == .regular ? 90 : 70,
                                         cornerRadius: sizeClass == .regular ? 30 : 20)
                             .padding(.top, 12)
-                            .padding(.horizontal, 24)
+                            .padding(.horizontal, 16)
                         }
 
                         Text(word.gr)
                             .font(.largeTitle.bold())
                             .multilineTextAlignment(.center)
+                            .lineLimit(nil)
+                            .fixedSize(horizontal: false, vertical: true)
                             .padding()
-                            .glassCard(height: 120, cornerRadius: 30)
-                            .padding(.horizontal, 24)
+                            .glassCard(height: sizeClass == .regular ? 140 : 120, cornerRadius: cornerRadius)
+                            .padding(.horizontal, 16)
                             .padding(.top, 40)
 
                         if showTranslation {
                             Text(isEnglish ? word.en : word.ru)
-                                .font(sizeClass == .regular ? .largeTitle : .title2)
+                                .font(.largeTitle)
                                 .foregroundColor(.primary)
+                                .multilineTextAlignment(.center)
+                                .lineLimit(nil)
+                                .fixedSize(horizontal: false, vertical: true)
                                 .transition(.opacity)
+                                .padding(.horizontal, 16)
                         }
 
                         Spacer()
@@ -96,7 +108,7 @@ struct TrainingView: View {
                                     Button {
                                         Task { await handleRating(rating, for: word) }
                                     } label: {
-                                        Text(rating.stringValue.capitalized)
+                                        Text(rating.localized)
                                             .font(.body)
                                             .foregroundColor(.primary)
                                             .frame(maxWidth: .infinity)
@@ -119,7 +131,7 @@ struct TrainingView: View {
                                     .frame(maxWidth: .infinity)
                                     .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
                             }
-                            .padding(.horizontal, 24)
+                            .padding(.horizontal, 16)
                             .padding(.bottom, 40)
                         }
                     }
@@ -258,5 +270,11 @@ struct TrainingView: View {
 extension Array {
     subscript(safe index: Int) -> Element? {
         indices.contains(index) ? self[index] : nil
+    }
+}
+
+extension Rating {
+    var localized: String {
+        NSLocalizedString("rating.\(self.stringValue)", comment: "")
     }
 }

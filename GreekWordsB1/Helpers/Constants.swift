@@ -19,6 +19,11 @@ enum Texts {
     static let trainingInfo: LocalizedStringKey = "trainingInfo"
     static let trainingHelp: LocalizedStringKey = "trainingHelp"
     static let showTranslation: LocalizedStringKey = "showTranslation"
+    static let wordsDone: LocalizedStringKey = "wordsDone"
+    static let noOpenGroups: LocalizedStringKey = "noOpenGroups"
+    static let wordsToday: LocalizedStringKey = "wordsToday"
+    static let new: LocalizedStringKey = "new"
+    static let review: LocalizedStringKey = "review"
 
     static var allWords: String {
         NSLocalizedString("allWords", comment: "")
