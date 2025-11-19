@@ -21,11 +21,10 @@ Each round has 10 questions.
 In the Settings section, you can select your preferred language or enable blur mode to hide answers until you tap the screen.
 You can see your quiz statistics and progress in the Statistics section.";
 "trainingInfo" = "Training Mode";
-"trainingHelp" = "The Training section is currently under development.
-It will be a modern spaced-repetition mode inspired by Anki, designed to help you remember words more effectively.
-You’ll be able to study at your own pace, revisiting words you’ve already encountered in quizzes.
-The app will automatically choose which words to review next, so you can build long-term memory naturally.
-This mode will help you track progress, focus on difficult words, and gradually strengthen your vocabulary.";
+"trainingHelp" = "The Training section helps you reinforce Greek words using a spaced-repetition system inspired by Anki.
+Words are added here automatically after you open a topic in the Quiz section. Once you access a quiz group, all its words become available for training.
+You can review vocabulary at your own pace, revisit words you’ve already seen in quizzes, and focus on those that require more practice.
+The app selects which words to show next, helping you build long-term memory naturally and track your overall progress.";
 "showTranslation" = "Show translation";
 "wordsDone" = "All the words for today are done!";
 "noOpenGroups" = "You don't have any open groups yet. 
@@ -33,7 +32,7 @@ To open a group, complete at least one topic in the Quiz section.";
 "wordsToday" = "Words for today:";
 "new" = "New:";
 "review" = "Review:";
-"rating.again"  = "Again";
-"rating.hard"   = "Hard";
-"rating.good"   = "Good";
-"rating.easy"   = "Easy";
+"rating.again" = "Again";
+"rating.hard" = "Hard";
+"rating.good" = "Good";
+"rating.easy" = "Easy";

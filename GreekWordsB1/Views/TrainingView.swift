@@ -191,7 +191,7 @@ struct TrainingView: View {
             .frame(maxWidth: .infinity)
             .glassLabel(height: 55, cornerRadius: 20)
             .padding(.horizontal, 120)
-            .padding(.top, 4)
+            .padding(.top, 1)
         }
 
         Spacer()
