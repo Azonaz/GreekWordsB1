@@ -24,6 +24,9 @@ enum Texts {
     static let wordsToday: LocalizedStringKey = "wordsToday"
     static let new: LocalizedStringKey = "new"
     static let review: LocalizedStringKey = "review"
+    static let studyWords: LocalizedStringKey = "studyWords"
+    static let reviewWords: LocalizedStringKey = "reviewWords"
+    static let done: LocalizedStringKey = "done"
 
     static var allWords: String {
         NSLocalizedString("allWords", comment: "")
@@ -47,5 +50,25 @@ enum Texts {
 
     static var blurOff: String {
         NSLocalizedString("blurOff", comment: "")
+    }
+
+    static var wordsLearn: String {
+        NSLocalizedString("wordsLearn", comment: "")
+    }
+
+    static var wordsLearned: String {
+        NSLocalizedString("wordsLearned", comment: "")
+    }
+
+    static var weakWords: String {
+        NSLocalizedString("weakWords", comment: "")
+    }
+
+    static var wWords: String {
+        NSLocalizedString("wWords", comment: "")
+    }
+
+    static var staleWords: String {
+        NSLocalizedString("staleWords", comment: "")
     }
 }

@@ -2,22 +2,87 @@ import Foundation
 import FSRS
 
 final class StatsService {
-    static func wordsDueTomorrow(_ all: [WordProgress]) -> Int {
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
-        return all.filter { $0.state != .new && $0.due.isSameDay(as: tomorrow) }.count
+    // Quiz stats
+    static func totalWords(_ words: [Word]) -> Int {
+        words.count
     }
 
-    static func stabilityDistribution(_ all: [WordProgress]) -> [Double] {
-        all.map { $0.stability }
+    static func seenWords(_ progress: [WordProgress]) -> Int {
+        progress.filter { $0.seen }.count
     }
 
-    static func strongestWords(_ all: [WordProgress], limit: Int = 20) -> [WordProgress] {
-        all.sorted { $0.stability > $1.stability }.prefix(limit).map { $0 }
+    static func learnedWords(_ progress: [WordProgress]) -> Int {
+        progress.filter { $0.learned }.count
     }
-}
 
-extension Date {
-    func isSameDay(as other: Date, calendar: Calendar = .current) -> Bool {
-        calendar.isDate(self, inSameDayAs: other)
+    static func completedQuizzes(_ stats: [QuizStats]) -> Int {
+        stats.first?.completedCount ?? 0
+    }
+
+    static func averageQuizScore(_ stats: [QuizStats]) -> Int {
+        Int(stats.first?.averageScore ?? 0)
+    }
+
+    // Training stats
+    static func studyingWordsCount(words: [Word], groups: [GroupMeta]) -> Int {
+        let openIDs = groups.filter { $0.opened }.map(\.id)
+        return words.filter { openIDs.contains($0.groupID) }.count
+    }
+
+    static func learnedWordsCount(_ progress: [WordProgress]) -> Int {
+        progress.filter { $0.learned }.count
+    }
+
+    // words that are difficult to remember
+    static func weakWords(_ allProgress: [WordProgress]) -> [WordProgress] {
+        allProgress
+            .filter { progress in
+                let totalReviews = progress.correctAnswers + progress.lapses
+                
+                guard totalReviews >= 0 else { return false }
+                
+                guard progress.lapses >= 1 else { return false }
+ 
+                return true
+            }
+            .sorted { lhs, rhs in
+                // the lower the stability, the weaker it is
+                if lhs.stability != rhs.stability {
+                    return lhs.stability < rhs.stability
+                }
+                // more lapses — worse
+                if lhs.lapses != rhs.lapses {
+                    return lhs.lapses > rhs.lapses
+                }
+                // higher difficulty — worse
+                return lhs.difficulty > rhs.difficulty
+            }
+    }
+
+    static func weakWordsCount(_ allProgress: [WordProgress]) -> Int {
+        weakWords(allProgress).count
+    }
+
+    // words that haven't been repeated in a long time
+    static func staleWords(_ allProgress: [WordProgress], weak: [WordProgress], days: Int = 2) -> [WordProgress] {
+        let weakIDs = Set(weak.map(\.compositeID))
+        let threshold = Calendar.current.date(byAdding: .day, value: -days, to: Date()) ?? .distantPast
+
+        return allProgress
+            .filter { progress in
+                // there was at least one repetition
+                guard let last = progress.lastReview else { return false }
+
+                // haven't repeated in a long time
+                guard last < threshold else { return false }
+
+                // is not a weak word
+                return !weakIDs.contains(progress.compositeID)
+            }
+            .sorted { $0.lastReview ?? .distantPast < $1.lastReview ?? .distantPast }
+    }
+
+    static func staleWordsCount(_ allProgress: [WordProgress], weak: [WordProgress], days: Int = 30) -> Int {
+        staleWords(allProgress, weak: weak, days: days).count
     }
 }

@@ -73,8 +73,7 @@ final class TrainingScheduler {
         // If it doesn't exist, we create it from the past due (fallback).
         let lastReview = progress.lastReview ?? (progress.state == .new ? nil : progress.due)
 
-        // 2) Making a card
-        var card = Card(
+        let card = Card(
             due: progress.due,
             stability: progress.stability,
             difficulty: progress.difficulty,
@@ -85,11 +84,6 @@ final class TrainingScheduler {
             state: progress.state,
             lastReview: lastReview
         )
-
-        // 3) For new words — a clean card
-        if progress.state == .new {
-            card = Card(due: now)
-        }
 
         do {
             let result = try fsrs.next(card: card, now: now, grade: rating)
@@ -102,21 +96,13 @@ final class TrainingScheduler {
             progress.scheduledDays = Int(next.scheduledDays)
             progress.due = next.due
             progress.state = next.state
-
-            // 4) lapses and reps: should be taken from FSRS
-            progress.lapses = next.lapses
-
-            // FSRS increases reps itself, meaning correctAnswers = reps
-            progress.correctAnswers = next.reps
-
-            // 5) lastReview should also be written
             progress.lastReview = next.lastReview
-
-            // 6) Learned
+            progress.lapses = next.lapses
+            progress.correctAnswers = next.reps
             progress.learned = (next.state == .review)
 
         } catch {
-            print("FSRS error: \(error)")
+            print("FSRS error:", error)
         }
 
         return progress

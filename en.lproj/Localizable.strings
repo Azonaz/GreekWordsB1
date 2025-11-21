@@ -1,6 +1,5 @@
 "quiz" = "Quiz";
 "training" = "Training";
-"soon" = "Coming soon";
 "categories" = "Categories";
 "settings" = "Settings";
 "language" = "Language";
@@ -37,3 +36,11 @@ To open a group, complete at least one topic in the Quiz section.";
 "rating.hard" = "Hard";
 "rating.good" = "Good";
 "rating.easy" = "Easy";
+"wordsLearn" =  "Words in progress";
+"wordsLearned" = "Words Learned";
+"weakWords" = "Words you struggle with";
+"wWords" = "Challenging words";
+"staleWords" = "Words you haven’t reviewed in a while";
+"studyWords" = "Study Words";
+"reviewWords" = "Review Words";
+"done" = "All the words are done!";
