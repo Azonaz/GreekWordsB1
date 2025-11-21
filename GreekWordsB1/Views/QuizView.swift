@@ -196,6 +196,21 @@ struct QuizView: View {
         guard selectedWord == nil else { return }
         isInteractionDisabled = true
 
+        if let currentWord {
+            let id = currentWord.compositeID
+            let descriptor = FetchDescriptor<WordProgress>(
+                predicate: #Predicate { $0.compositeID == id }
+            )
+
+            if let progress = try? context.fetch(descriptor).first {
+                progress.seen = true
+            } else {
+                context.insert(WordProgress(compositeID: id, seen: true))
+            }
+
+            try? context.save()
+        }
+
         selectedWord = word
         let correct = (word.compositeID == currentWord?.compositeID)
         isCorrect = correct
@@ -246,19 +261,6 @@ struct QuizView: View {
             stats.totalScore += result
         } else {
             context.insert(QuizStats(completedCount: 1, totalScore: result))
-        }
-
-        for word in quizWords {
-            let id = word.compositeID
-            let descriptor = FetchDescriptor<WordProgress>(
-                predicate: #Predicate { $0.compositeID == id }
-            )
-
-            if let wordProgress = try? context.fetch(descriptor).first {
-                wordProgress.seen = true
-            } else {
-                context.insert(WordProgress(compositeID: id, seen: true))
-            }
         }
 
         do {
