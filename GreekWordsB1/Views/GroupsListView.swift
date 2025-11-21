@@ -34,40 +34,26 @@ struct GroupsListView: View {
                 VStack(spacing: 16) {
                     ForEach(groups) { group in
                         NavigationLink(destination: QuizView(group: group)) {
-
-                            let title = Text(isEnglish ? group.nameEn : group.nameRu)
-                                .font(sizeClass == .regular ? .title2 : .title3)
-                                .foregroundColor(.primary)
-                                .lineLimit(nil)
-                                .multilineTextAlignment(.leading)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal, 20)
-
                             let counts = countForGroup(group)
                             let counterText = "\(counts.seen)/\(counts.total)"
-                            let base = UIColor(red: 162/255, green: 24/255, blue: 29/255, alpha: 1.0)
 
-                            let counter = StrokeText(
-                                text: counterText,
-                                fontSize: cardHeight * 0.70,
-                                weight: .heavy,
-                                fillColor: base.withAlphaComponent(colorScheme == .dark ? 0.4 : 0.07),
-                                strokeColor: base.withAlphaComponent(colorScheme == .dark ? 0.5 : 0.09),
-                                strokeWidth: 2.0,
-                                kerning: sizeClass == .regular ? 4.0 : 2.0
-                            )
-                            .frame(height: cardHeight)
-                            .offset(y: cardHeight * 0.06)
+                            HStack(alignment: .center) {
+                                Text(isEnglish ? group.nameEn : group.nameRu)
+                                    .font(sizeClass == .regular ? .title2 : .title3)
+                                    .foregroundColor(.primary)
+                                    .multilineTextAlignment(.leading)
+                                    .lineLimit(nil)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                                Text(counterText)
+                                    .font(sizeClass == .regular ? .title2 : .title3)
+                                    .foregroundColor(.secondary)
+                            }
                             .padding(.horizontal, 20)
-
-                            title
-                                .frame(height: cardHeight)
-                                .overlay(
-                                    counter,
-                                    alignment: .trailing
-                                )
-                                .glassCard(height: cardHeight, cornerRadius: cornerRadius)
-                                .padding(.horizontal, paddingHorizontal)
+                            .frame(height: cardHeight)
+                            .glassCard(height: cardHeight, cornerRadius: cornerRadius)
+                            .padding(.horizontal, paddingHorizontal)
                         }
                     }
                 }
