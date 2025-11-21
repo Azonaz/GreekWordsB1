@@ -63,6 +63,7 @@ struct QuizView: View {
             }
         }
         .onAppear {
+            context.autosaveEnabled = true
             haptic.prepare()
             markGroupAsOpened()
             startQuiz()
@@ -207,8 +208,6 @@ struct QuizView: View {
             } else {
                 context.insert(WordProgress(compositeID: id, seen: true))
             }
-
-            try? context.save()
         }
 
         selectedWord = word
@@ -261,12 +260,6 @@ struct QuizView: View {
             stats.totalScore += result
         } else {
             context.insert(QuizStats(completedCount: 1, totalScore: result))
-        }
-
-        do {
-            try context.save()
-        } catch {
-            print("Error saving statistics: \(error)")
         }
     }
 
