@@ -38,11 +38,11 @@ final class StatsService {
         allProgress
             .filter { progress in
                 let totalReviews = progress.correctAnswers + progress.lapses
-                
-                guard totalReviews >= 0 else { return false }
-                
+                // data for changing
+//                guard totalReviews >= 0 else { return false }
+
                 guard progress.lapses >= 1 else { return false }
- 
+
                 return true
             }
             .sorted { lhs, rhs in
@@ -64,7 +64,7 @@ final class StatsService {
     }
 
     // words that haven't been repeated in a long time
-    static func staleWords(_ allProgress: [WordProgress], weak: [WordProgress], days: Int = 2) -> [WordProgress] {
+    static func staleWords(_ allProgress: [WordProgress], weak: [WordProgress], days: Int = 80) -> [WordProgress] {
         let weakIDs = Set(weak.map(\.compositeID))
         let threshold = Calendar.current.date(byAdding: .day, value: -days, to: Date()) ?? .distantPast
 
@@ -82,7 +82,7 @@ final class StatsService {
             .sorted { $0.lastReview ?? .distantPast < $1.lastReview ?? .distantPast }
     }
 
-    static func staleWordsCount(_ allProgress: [WordProgress], weak: [WordProgress], days: Int = 30) -> Int {
+    static func staleWordsCount(_ allProgress: [WordProgress], weak: [WordProgress], days: Int = 80) -> Int {
         staleWords(allProgress, weak: weak, days: days).count
     }
 }

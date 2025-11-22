@@ -16,15 +16,32 @@
 "information" = "Information";
 "quizInfo" = "Quiz Mode";
 "quizHelp" = "The Quiz section lets you test your knowledge of Greek words in an interactive way.
+
 Each round has 10 questions.
+
 Words are divided into groups, and the counter on the right side of each group shows how many words you have already seen and the total number of words in that group.
+
 In the Settings section, you can select your preferred language or enable blur mode to hide answers until you tap the screen.
+
 You can see your quiz statistics and progress in the Statistics section.";
 "trainingInfo" = "Training Mode";
-"trainingHelp" = "The Training section helps you reinforce Greek words using a spaced-repetition system inspired by Anki.
-Words are added here automatically after you open a topic in the Quiz section. Once you access a quiz group, all its words become available for training.
-You can review vocabulary at your own pace, revisit words you’ve already seen in quizzes, and focus on those that require more practice.
-The app selects which words to show next, helping you build long-term memory naturally and track your overall progress.";
+"trainingHelp" = "The Training section helps you reinforce Greek vocabulary using a spaced-repetition system inspired by Anki.
+
+Once you open a topic in the Quiz section, all its words automatically become available for training. You can review flashcards at your own pace, while the app selects the optimal moment to repeat each word.
+
+Each flashcard screen offers four rating options:
+• Again — you couldn’t recall the word; the next review is scheduled sooner.
+• Hard — the word is recalled with effort; the interval increases only slightly.
+• Good — the word is remembered confidently.
+• Easy — the word is well mastered; the interval increases noticeably more.
+
+The algorithm analyzes your answers and determines the best time to show each word again, helping you store it in long-term memory.
+
+The Statistics section includes two additional sets:
+• Words you struggle with — according to the algorithm, these are learned the least reliably.
+• Words you haven’t reviewed in a while — those that haven’t appeared in training for an extended period.
+
+You can revisit these lists at any time to strengthen weak areas and maintain steady progress.";
 "showTranslation" = "Show translation";
 "wordsDone" = "All the words for today are done!";
 "noOpenGroups" = "You don't have any open groups yet. 
