@@ -43,22 +43,25 @@ final class GroupMeta {
 @Model
 final class WordProgress {
     @Attribute(.unique) var compositeID: String
+    // for migration
+    var stateRaw: Int = CardState.new.rawValue
 
-    // FSRS fields with safe defaults
     var stability: Double = 0
     var difficulty: Double = 0
     var elapsedDays: Int = 0
     var scheduledDays: Int = 0
     var due: Date = Date.distantPast
-    var state: CardState = CardState.new
     var lastReview: Date?
     var assignedDate: Date?
-
-    // Additional app-level statistics
     var learned: Bool = false
     var correctAnswers: Int = 0
     var seen: Bool = false
     var lapses: Int = 0
+
+    var state: CardState {
+        get { CardState(rawValue: stateRaw) ?? .new }
+        set { stateRaw = newValue.rawValue }
+    }
 
     init(
         compositeID: String,
