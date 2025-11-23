@@ -3,7 +3,13 @@ import FSRS
 import SwiftData
 
 final class TrainingScheduler {
-    private let fsrs = FSRS(parameters: FSRSParameters())
+    private let fsrs = FSRS(
+        parameters: FSRSParameters(
+            requestRetention: 0.9,
+            enableFuzz: false,
+            enableShortTerm: false
+        )
+    )
 
     /// Selects the words to be displayed today:
     /// - new (state == .new)
