@@ -82,4 +82,10 @@ final class TrainingAccessManager: ObservableObject {
         kvs.synchronize()
         refreshState()
     }
+
+    func setUnlocked() {
+        kvs.set(true, forKey: unlockKey)
+        kvs.synchronize()
+        refreshState()
+    }
 }

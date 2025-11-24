@@ -1,28 +1,83 @@
 import SwiftUI
+import StoreKit
 
 struct TrainingPaywallView: View {
+    @EnvironmentObject var purchaseManager: PurchaseManager
+    @EnvironmentObject var trainingAccess: TrainingAccessManager
     @Environment(\.horizontalSizeClass) var sizeClass
 
+    @State private var purchasing = false
+    @State private var errorMessage: String?
+
+    private var buttonHeight: CGFloat {
+        sizeClass == .regular ? 60 : 55
+    }
+
+    private var cornerRadius: CGFloat {
+        sizeClass == .regular ? 30 : 25
+    }
+
+    private var horizontalPadding: CGFloat {
+        sizeClass == .regular ? 100 : 60
+    }
+
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color.gray.opacity(0.05)
-                    .ignoresSafeArea()
-                VStack(spacing: 24) {
-                    Text("The free week is over.")
-                        .font(.title2)
-                        .multilineTextAlignment(.center)
+        ZStack {
+            Color.gray.opacity(0.05)
+                .ignoresSafeArea()
 
-                    Text("The training will be available after purchase. The payment screen will appear here shortly.")
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
+            VStack(spacing: 24) {
 
-                    Button("Back") {
+                Text("Training Access Expired")
+                    .font(sizeClass == .regular ? .largeTitle : .title)
+                    .fontWeight(.semibold)
+                    .padding(.top, sizeClass == .regular ? 40 : 20)
 
+                Text("Unlock unlimited access to Training with a one-time purchase.")
+                    .font(.body)
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+
+                // Purchase Button
+                if let product = purchaseManager.products.first(where: { $0.id == "training_unlock" }) {
+
+                    Button {
+                        Task {
+                            purchasing = true
+                            let success = await purchaseManager.purchase(product)
+                            purchasing = false
+
+                            if success {
+                                trainingAccess.setUnlocked()
+                            } else {
+                                errorMessage = "Purchase failed. Please try again."
+                            }
+                        }
+                    } label: {
+                        Text(purchasing ? "Processing…" : "Unlock for \(product.displayPrice)")
+                            .frame(maxWidth: .infinity)
+                            .frame(height: buttonHeight)
+                            .background(Color.blue.opacity(0.2))
+                            .foregroundColor(.primary)
+                            .cornerRadius(cornerRadius)
                     }
-                    .buttonStyle(.borderedProminent)
+                    .padding(.horizontal, horizontalPadding)
+                    .disabled(purchasing)
+
+                } else {
+                    ProgressView("Loading price…")
+                        .padding(.top, 8)
                 }
-                .padding()
+
+                if let errorMessage {
+                    Text(errorMessage)
+                        .foregroundColor(.red)
+                        .font(.footnote)
+                        .padding(.top, 4)
+                }
+
+                Spacer()
             }
         }
         .background(
@@ -31,11 +86,11 @@ struct TrainingPaywallView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
                 .opacity(0.2)
-            )
-        .navigationTitle("")
+        )
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text(Texts.training)
+                Text("Training")
                     .font(sizeClass == .regular ? .largeTitle : .title2)
                     .foregroundColor(.primary)
             }
