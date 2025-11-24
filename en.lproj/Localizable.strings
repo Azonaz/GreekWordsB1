@@ -61,3 +61,4 @@ To open a group, complete at least one topic in the Quiz section.";
 "studyWords" = "Study words";
 "reviewWords" = "Review words";
 "done" = "All the words are done!";
+"wordsLeft" = "Words left: ";

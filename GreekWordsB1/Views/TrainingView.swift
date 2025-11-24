@@ -327,9 +327,6 @@ struct TrainingView: View {
     }
 
     func handleRating(_ rating: Rating, for word: Word) async {
-        print("\n================= HANDLE RATING =================")
-        print("WORD:", word.compositeID, "rating:", rating)
-
         do {
             // load fresh WordProgress
             guard let wordProgress = try context
@@ -340,50 +337,12 @@ struct TrainingView: View {
                 return
             }
 
-            print("--- BEFORE FSRS ---")
-            print("state:", wordProgress.state,
-                  "| stability:", wordProgress.stability,
-                  "| difficulty:", wordProgress.difficulty)
-            print("lapses:", wordProgress.lapses,
-                  "| reps:", wordProgress.correctAnswers)
-            print("lastReview:", wordProgress.lastReview as Any)
-            print("due:", wordProgress.due)
-
             // FSRS call
-            print("\nCalling FSRS.nextReview...")
             let updated = scheduler.nextReview(for: wordProgress, rating: rating)
 
-            print("\n--- FSRS OUTPUT ---")
-            print("state:", updated.state,
-                  "| stability:", updated.stability,
-                  "| difficulty:", updated.difficulty)
-            print("lapses:", updated.lapses,
-                  "| reps:", updated.correctAnswers)
-            print("lastReview:", updated.lastReview as Any)
-            print("due:", updated.due)
-
             // Applying changes
-            wordProgress.stability = updated.stability
-            wordProgress.difficulty = updated.difficulty
-            wordProgress.elapsedDays = updated.elapsedDays
-            wordProgress.scheduledDays = updated.scheduledDays
-            wordProgress.due = updated.due
-            wordProgress.state = updated.state
-            wordProgress.lastReview = updated.lastReview
-            wordProgress.assignedDate = updated.assignedDate
-            wordProgress.learned = updated.learned
-            wordProgress.correctAnswers = updated.correctAnswers
-            wordProgress.seen = updated.seen
-            wordProgress.lapses = updated.lapses
-
+            wordProgress.apply(from: updated)
             try context.save()
-
-            print("\n--- AFTER SAVE ---")
-            print("Saved state:", wordProgress.state)
-            print("Saved lapses:", wordProgress.lapses)
-            print("Saved reps:", wordProgress.correctAnswers)
-
-            print("================================================\n")
 
             // UI update
             withAnimation {
@@ -405,18 +364,5 @@ struct TrainingView: View {
         } catch {
             print("Review error:", error)
         }
-    }
-
-}
-
-extension Array {
-    subscript(safe index: Int) -> Element? {
-        indices.contains(index) ? self[index] : nil
-    }
-}
-
-extension Rating {
-    var localized: String {
-        NSLocalizedString("rating.\(self.stringValue)", comment: "")
     }
 }

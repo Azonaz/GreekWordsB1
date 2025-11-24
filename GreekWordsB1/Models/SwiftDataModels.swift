@@ -75,3 +75,20 @@ final class WordProgress {
         self.seen = seen
     }
 }
+
+extension WordProgress {
+    func apply(from next: WordProgress) {
+        self.stability = next.stability
+        self.difficulty = next.difficulty
+        self.elapsedDays = next.elapsedDays
+        self.scheduledDays = next.scheduledDays
+        self.due = next.due
+        self.state = next.state
+        self.lastReview = next.lastReview
+        self.assignedDate = next.assignedDate
+        self.learned = next.learned
+        self.correctAnswers = next.correctAnswers
+        self.seen = next.seen
+        self.lapses = next.lapses
+    }
+}

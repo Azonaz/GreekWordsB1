@@ -28,6 +28,10 @@ struct TrainingSelectionView: View {
         hSizeClass == .regular ? 40 : 30
     }
 
+    private var isPhoneLandscape: Bool {
+        UIDevice.current.userInterfaceIdiom == .phone && vSizeClass == .compact
+    }
+
     var body: some View {
         ZStack {
             Color.gray.opacity(0.05).ignoresSafeArea()
@@ -36,16 +40,19 @@ struct TrainingSelectionView: View {
                 if finished {
                     Text(Texts.done)
                         .multilineTextAlignment(.center)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
                         .padding()
-                        .glassLabel(
-                            height: hSizeClass == .regular ? 120 : 80,
-                            cornerRadius: cornerRadius
-                        )
+                        .glassLabel(height: hSizeClass == .regular ? 90 : 70,
+                                    cornerRadius: hSizeClass == .regular ? 30 : 20)
                         .padding(.horizontal, 16)
 
                 } else if let word = currentWord {
-                    trainingLayout(for: word)
-
+                    if isPhoneLandscape {
+                        landscapeLayout(word)
+                    } else {
+                        portraitLayout(word)
+                    }
                 } else {
                     ProgressView()
                 }
@@ -59,35 +66,42 @@ struct TrainingSelectionView: View {
             ToolbarItem(placement: .principal) {
                 Text(title)
                     .font(hSizeClass == .regular ? .largeTitle : .title2)
+                    .foregroundColor(.primary)
             }
         }
     }
 
     @ViewBuilder
-    private func trainingLayout(for word: Word) -> some View {
+    private func portraitLayout(_ word: Word) -> some View {
         VStack(spacing: 40) {
-            Text("\(weakWords.count - currentIndex) слов осталось")
-                .font(.headline)
-                .glassLabel(
-                    height: hSizeClass == .regular ? 70 : 60,
-                    cornerRadius: cornerRadius
-                )
-                .padding(.horizontal, 16)
-                .padding(.top, 12)
+            HStack(spacing: 0) {
+                Text(Texts.wordsLeft)
+                Text(" \(weakWords.count - currentIndex)")
+            }
+            .font(.headline)
+            .glassLabel(height: hSizeClass == .regular ? 70 : 50,
+                        cornerRadius: cornerRadius)
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
 
             Text(word.gr)
                 .font(.largeTitle.bold())
                 .multilineTextAlignment(.center)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
                 .padding()
                 .glassCard(height: hSizeClass == .regular ? 140 : 120,
                            cornerRadius: cornerRadius)
                 .padding(.horizontal, 16)
-                .padding(.top, 20)
+                .padding(.top, 40)
 
             if showTranslation {
                 Text(isEnglish ? word.en : word.ru)
                     .font(.largeTitle)
+                    .foregroundColor(.primary)
                     .multilineTextAlignment(.center)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
                     .transition(.opacity)
                     .padding(.horizontal, 16)
             }
@@ -102,6 +116,7 @@ struct TrainingSelectionView: View {
                 } label: {
                     Text(Texts.showTranslation)
                         .font(hSizeClass == .regular ? .title : .title2)
+                        .multilineTextAlignment(.center)
                         .foregroundColor(.primary)
                         .padding()
                         .frame(maxWidth: .infinity)
@@ -109,10 +124,75 @@ struct TrainingSelectionView: View {
                                    cornerRadius: cornerRadius)
                 }
                 .padding(.horizontal, 16)
-                .padding(.bottom, 36)
+                .padding(.bottom, 40)
             }
         }
         .padding()
+    }
+
+    @ViewBuilder
+    private func landscapeLayout(_ word: Word) -> some View {
+        HStack(spacing: 24) {
+            Text(Texts.wordsLeft) + Text(" \(weakWords.count - currentIndex)")
+                .font(.headline)
+        }
+        .frame(maxWidth: .infinity)
+        .glassLabel(height: 55, cornerRadius: 20)
+        .padding(.horizontal, 120)
+        .padding(.top, 1)
+
+        Spacer()
+
+        HStack(spacing: 20) {
+            VStack(spacing: 12) {
+                Text(word.gr)
+                    .font(.largeTitle.bold())
+                    .multilineTextAlignment(.center)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding()
+                    .glassCard(height: 100, cornerRadius: cornerRadius)
+
+                if showTranslation {
+                    Text(isEnglish ? word.en : word.ru)
+                        .font(.largeTitle)
+                        .multilineTextAlignment(.center)
+                        .transition(.opacity)
+                }
+            }
+            .padding(.leading, 24)
+            .frame(maxWidth: .infinity)
+
+            VStack(spacing: 12) {
+                if showTranslation {
+                    ForEach(Rating.allCases.filter { $0 != .manual }, id: \.self) { rating in
+                        Button {
+                            Task { await handleRating(rating, for: word) }
+                        } label: {
+                            Text(rating.localized)
+                                .font(.body)
+                                .foregroundColor(.primary)
+                                .frame(maxWidth: .infinity)
+                                .glassCard(height: 45, cornerRadius: 20)
+                        }
+                    }
+                } else {
+                    Button {
+                        withAnimation { showTranslation = true }
+                    } label: {
+                        Text(Texts.showTranslation)
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(.primary)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .glassCard(height: 100, cornerRadius: cornerRadius)
+                    }
+                }
+            }
+            .padding(.trailing, 24)
+        }
+
+        Spacer()
     }
 
     @ViewBuilder
@@ -126,7 +206,7 @@ struct TrainingSelectionView: View {
                         .font(.body)
                         .foregroundColor(.primary)
                         .frame(maxWidth: .infinity)
-                        .glassCard(height: hSizeClass == .regular ? 55 : 40,
+                        .glassCard(height: hSizeClass == .regular ? 55 : 35,
                                    cornerRadius: hSizeClass == .regular ? 25 : 15)
                 }
             }
@@ -156,14 +236,22 @@ struct TrainingSelectionView: View {
 
     private func handleRating(_ rating: Rating, for word: Word) async {
         do {
-            if let wProgress = try context
+            // load fresh WordProgress
+            guard let wProgress = try context
                 .fetch(FetchDescriptor<WordProgress>())
-                .first(where: { $0.compositeID == word.compositeID }) {
-                let scheduler = TrainingScheduler()
-                let updated = scheduler.nextReview(for: wProgress, rating: rating)
-                context.insert(updated)
-                try context.save()
+                .first(where: { $0.compositeID == word.compositeID })
+            else {
+                print("ERROR: Progress not found for", word.compositeID)
+                return
             }
+
+            // FSRS call
+            let scheduler = TrainingScheduler()
+            let updated = scheduler.nextReview(for: wProgress, rating: rating)
+
+            // Applying changes
+            wProgress.apply(from: updated)
+            try context.save()
 
             withAnimation {
                 if currentIndex + 1 < weakWords.count {

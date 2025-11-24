@@ -75,7 +75,7 @@ final class TrainingScheduler {
     func nextReview(for progress: WordProgress, rating: Rating) -> WordProgress {
         let now = Date()
 
-        // 1) lastReview should be stored in the WordProgress model
+        // lastReview should be stored in the WordProgress model
         // If it doesn't exist, we create it from the past due (fallback).
         let lastReview = progress.lastReview ?? (progress.state == .new ? nil : progress.due)
 
@@ -91,26 +91,32 @@ final class TrainingScheduler {
             lastReview: lastReview
         )
 
+        var nextCard: Card
         do {
             let result = try fsrs.next(card: card, now: now, grade: rating)
-            let next = result.card
-
-            // Updating WordProgress correctly
-            progress.stability = next.stability
-            progress.difficulty = next.difficulty
-            progress.elapsedDays = Int(next.elapsedDays)
-            progress.scheduledDays = Int(next.scheduledDays)
-            progress.due = next.due
-            progress.state = next.state
-            progress.lastReview = next.lastReview
-            progress.lapses = next.lapses
-            progress.correctAnswers = next.reps
-            progress.learned = (next.state == .review)
-
+            nextCard = result.card
         } catch {
             print("FSRS error:", error)
+            return progress
         }
 
-        return progress
+        let updated = WordProgress(
+            compositeID: progress.compositeID,
+            learned: (nextCard.state == .review),
+            correctAnswers: nextCard.reps,
+            seen: true
+        )
+
+        updated.stability = nextCard.stability
+        updated.difficulty = nextCard.difficulty
+        updated.elapsedDays = Int(nextCard.elapsedDays)
+        updated.scheduledDays = Int(nextCard.scheduledDays)
+        updated.due = nextCard.due
+        updated.state = nextCard.state
+        updated.lastReview = nextCard.lastReview
+        updated.lapses = nextCard.lapses
+        updated.assignedDate = progress.assignedDate
+
+        return updated
     }
 }

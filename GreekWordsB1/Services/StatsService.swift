@@ -34,19 +34,15 @@ final class StatsService {
     }
 
     // words that are difficult to remember
-    static func weakWords(_ allProgress: [WordProgress]) -> [WordProgress] {
+    static func weakWords(_ allProgress: [WordProgress], thresholdLapses: Int = 7,
+                          stabilityThreshold: Double = 3.0) -> [WordProgress] {
         allProgress
             .filter { progress in
-                let totalReviews = progress.correctAnswers + progress.lapses
-                // data for changing
-//                guard totalReviews >= 0 else { return false }
-
-                guard progress.lapses >= 1 else { return false }
-
-                return true
+                progress.lapses >= thresholdLapses &&
+                progress.stability < stabilityThreshold
             }
             .sorted { lhs, rhs in
-                // the lower the stability, the weaker it is
+                // lower stability first
                 if lhs.stability != rhs.stability {
                     return lhs.stability < rhs.stability
                 }
