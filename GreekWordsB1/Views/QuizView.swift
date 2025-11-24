@@ -264,11 +264,21 @@ struct QuizView: View {
     }
 
     private func highlightColors(for word: Word) -> [Color]? {
-        guard let selectedWord else { return nil }
-        if word.compositeID != selectedWord.compositeID { return nil }
+        guard let currentWord else { return nil }
+
+        // correct highlighting in case of error
+        if isCorrect == false, word.compositeID == currentWord.compositeID {
+            return [.green.opacity(0.4), .green.opacity(0.7), .green.opacity(0.4)]
+        }
+
+        // highlighting of the selected option (red or green)
+        guard let selectedWord, word.compositeID == selectedWord.compositeID else {
+            return nil
+        }
+
         return isCorrect == true
-        ? [.green.opacity(0.4), .green.opacity(0.7), .green.opacity(0.4)]
-        : [.red.opacity(0.4), .red.opacity(0.8), .red.opacity(0.4)]
+            ? [.green.opacity(0.4), .green.opacity(0.7), .green.opacity(0.4)]
+            : [.red.opacity(0.4), .red.opacity(0.8), .red.opacity(0.4)]
     }
 
     private func shake() {
