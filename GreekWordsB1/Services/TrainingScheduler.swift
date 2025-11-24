@@ -7,7 +7,7 @@ final class TrainingScheduler {
         parameters: FSRSParameters(
             requestRetention: 0.9,
             enableFuzz: false,
-            enableShortTerm: false
+            enableShortTerm: true
         )
     )
 
@@ -71,8 +71,9 @@ final class TrainingScheduler {
         }
 
         // Repetitions according to schedule FSRS
-        let dueWords = all.filter {
-            $0.state != .new && $0.due <= now
+        let dueWords = all.filter { progress in
+            if progress.state == .learning { return true }
+            return progress.state != .new && progress.due <= now
         }
 
         return todaysNewWords + dueWords

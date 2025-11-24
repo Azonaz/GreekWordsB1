@@ -4,6 +4,7 @@ import FSRS
 
 enum ReviewState {
     case new
+    case learning
     case review
 }
 
@@ -20,6 +21,7 @@ struct TrainingView: View {
     @State private var noGroups = false
     @State private var todayNew = 0
     @State private var todayReview = 0
+    @State private var todayLearning = 0
     @State private var wordStates: [String: ReviewState] = [:]
 
     private var todayTotal: Int {
@@ -98,6 +100,7 @@ struct TrainingView: View {
 
                     HStack(spacing: 12) {
                         Text(Texts.new) + Text(" \(todayNew)")
+                        Text(Texts.learning) + Text(" \(todayLearning)")
                         Text(Texts.review) + Text(" \(todayReview)")
                     }
                     .font(.subheadline)
@@ -180,6 +183,10 @@ struct TrainingView: View {
                     .font(.headline)
 
                 Text(Texts.new) + Text(" \(todayNew)")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+
+                Text(Texts.learning) + Text(" \(todayLearning)")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
 
@@ -300,10 +307,19 @@ struct TrainingView: View {
             scheduler.trimAssignedNewWordsIfNeeded(progresses)
             let todaysProgresses = scheduler.wordsForToday(from: progresses)
             let newCount = todaysProgresses.filter { $0.state == .new }.count
-            let totalCount = todaysProgresses.count
-            let reviewCount = totalCount - newCount
+            let learningCount = todaysProgresses.filter { $0.state == .learning }.count
+            let reviewCount = todaysProgresses.filter { $0.state == .review || $0.state == .relearning }.count
             wordStates = Dictionary(uniqueKeysWithValues: todaysProgresses.map { progress in
-                let state: ReviewState = (progress.state == .new ? .new : .review)
+                let state: ReviewState = {
+                    switch progress.state {
+                    case .new:
+                        return .new
+                    case .learning:
+                        return .learning
+                    case .review, .relearning:
+                        return .review
+                    }
+                }()
                 return (progress.compositeID, state)
             })
 
@@ -319,6 +335,7 @@ struct TrainingView: View {
                 showTranslation = false
                 finished = dueWords.isEmpty
                 todayNew = newCount
+                todayLearning = learningCount
                 todayReview = reviewCount
             }
 
@@ -356,8 +373,12 @@ struct TrainingView: View {
 
                 if let state = wordStates[word.compositeID] {
                     switch state {
-                    case .new:    todayNew -= 1
-                    case .review: todayReview -= 1
+                    case .new:
+                        todayNew -= 1
+                    case .learning:
+                        todayLearning -= 1
+                    case .review:
+                        todayReview -= 1
                     }
                 }
             }

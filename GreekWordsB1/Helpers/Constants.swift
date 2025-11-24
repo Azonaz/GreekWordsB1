@@ -23,6 +23,7 @@ enum Texts {
     static let noOpenGroups: LocalizedStringKey = "noOpenGroups"
     static let wordsToday: LocalizedStringKey = "wordsToday"
     static let new: LocalizedStringKey = "new"
+    static let learning: LocalizedStringKey = "learning"
     static let review: LocalizedStringKey = "review"
     static let studyWords: LocalizedStringKey = "studyWords"
     static let reviewWords: LocalizedStringKey = "reviewWords"
