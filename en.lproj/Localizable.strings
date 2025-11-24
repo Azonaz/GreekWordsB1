@@ -41,7 +41,9 @@ The Statistics section includes two additional sets:
 • Words you struggle with — according to the algorithm, these are learned the least reliably.
 • Words you haven’t reviewed in a while — those that haven’t appeared in training for an extended period.
 
-You can revisit these lists at any time to strengthen weak areas and maintain steady progress.";
+You can revisit these lists at any time to strengthen weak areas and maintain steady progress.
+
+Try the Training mode free for one week. After the trial, full access can be unlocked with a one-time purchase.";
 "showTranslation" = "Show translation";
 "wordsDone" = "All the words for today are done!";
 "noOpenGroups" = "You don't have any open groups yet. 
@@ -64,3 +66,12 @@ To open a group, complete at least one topic in the Quiz section.";
 "done" = "All the words are done!";
 "wordsLeft" = "Words left: ";
 "newWordsNumber" = "New words per day";
+"trainingAccess" = "Training access";
+"accessExpired" = "Training access expired";
+"unlockAccess" = "Your free trial week has ended. Unlock unlimited access to Training with a one-time purchase.";
+"errorPurchase" = "Purchase failed. Please try again.";
+"unlockFor" = "Unlock for";
+"loadPrice" = "Loading price…";
+"restore" = "Restore purchase";
+"purchaseRestored" = "Purchase restored";
+"noPurchase" = "No purchases to restore";

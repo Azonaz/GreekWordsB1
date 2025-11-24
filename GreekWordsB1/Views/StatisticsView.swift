@@ -6,6 +6,7 @@ struct StatisticsView: View {
     @Query private var words: [Word]
     @Query private var progress: [WordProgress]
     @Query private var groups: [GroupMeta]
+    @EnvironmentObject var trainingAccess: TrainingAccessManager
     @Environment(\.horizontalSizeClass) var sizeClass
 
     private var cardHeight: CGFloat {
@@ -63,50 +64,58 @@ struct StatisticsView: View {
                         StatCard(title: Texts.wordsLearn, value: "\(studyingCount)")
                         StatCard(title: Texts.wordsLearned, value: "\(learnedCount)")
                         if weakWordsCount > 0 {
-                            StatCardWithButton(
-                                title: Texts.weakWords,
-                                value: "\(weakWordsCount)",
-                                horizontalPadding: horizontalPadding
-                            ) {
-                                NavigationLink(
-                                    destination: TrainingSelectionView(wordsProgress: weakWords,
-                                                                       title: Texts.wWords)
+                            if trainingAccess.hasAccess {
+                                StatCardWithButton(
+                                    title: Texts.weakWords,
+                                    value: "\(weakWordsCount)",
+                                    horizontalPadding: horizontalPadding
                                 ) {
-                                    Text(Texts.studyWords)
-                                        .foregroundColor(.primary)
-                                        .font(.headline)
-                                        .frame(maxWidth: .infinity)
-                                        .glassCard(
-                                            height: sizeClass == .regular ? 45 : 35,
-                                            cornerRadius: sizeClass == .regular ? 18 : 12
-                                        )
+                                    NavigationLink(
+                                        destination: TrainingSelectionView(wordsProgress: weakWords,
+                                                                           title: Texts.wWords)
+                                    ) {
+                                        Text(Texts.studyWords)
+                                            .foregroundColor(.primary)
+                                            .font(.headline)
+                                            .frame(maxWidth: .infinity)
+                                            .glassCard(
+                                                height: sizeClass == .regular ? 45 : 35,
+                                                cornerRadius: sizeClass == .regular ? 18 : 12
+                                            )
+                                    }
                                 }
+                            } else {
+                                StatCard(title: Texts.weakWords, value: "0")
                             }
                         } else {
                             StatCard(title: Texts.weakWords, value: "0")
                         }
                         if staleWordsCount > 0 {
-                            StatCardWithButton(
-                                title: Texts.staleWords,
-                                value: "\(staleWordsCount)",
-                                horizontalPadding: horizontalPadding
-                            ) {
-                                NavigationLink(
-                                    destination: TrainingSelectionView(wordsProgress: staleWords,
-                                                                       title: Texts.staleWords)
+                            if trainingAccess.hasAccess {
+                                StatCardWithButton(
+                                    title: Texts.staleWords,
+                                    value: "\(staleWordsCount)",
+                                    horizontalPadding: horizontalPadding
                                 ) {
-                                    Text(Texts.reviewWords)
-                                        .foregroundColor(.primary)
-                                        .font(.headline)
-                                        .frame(maxWidth: .infinity)
-                                        .glassCard(
-                                            height: sizeClass == .regular ? 45 : 35,
-                                            cornerRadius: sizeClass == .regular ? 18 : 12
-                                        )
+                                    NavigationLink(
+                                        destination: TrainingSelectionView(wordsProgress: staleWords,
+                                                                           title: Texts.staleWords)
+                                    ) {
+                                        Text(Texts.reviewWords)
+                                            .foregroundColor(.primary)
+                                            .font(.headline)
+                                            .frame(maxWidth: .infinity)
+                                            .glassCard(
+                                                height: sizeClass == .regular ? 45 : 35,
+                                                cornerRadius: sizeClass == .regular ? 18 : 12
+                                            )
+                                    }
                                 }
+                            } else {
+                                StatCard(title: Texts.staleWords, value: "0")
                             }
                         } else {
-                            StatCard(title: Texts.staleWords, value: "0")
+                            StatCard(title: Texts.weakWords, value: "0")
                         }
                     }
                     .padding(.horizontal, horizontalPadding)

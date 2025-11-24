@@ -77,7 +77,7 @@ final class TrainingAccessManager: ObservableObject {
 
     /// Reset (for tests)
     func resetTrialForDebug() {
-        kvs.removeObject(forKey: trialStartKey)
+//        kvs.removeObject(forKey: trialStartKey)
         kvs.removeObject(forKey: unlockKey)
         kvs.synchronize()
         refreshState()

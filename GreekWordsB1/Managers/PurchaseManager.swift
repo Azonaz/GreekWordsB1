@@ -17,11 +17,11 @@ final class PurchaseManager: ObservableObject {
 
     func loadProducts() async {
         do {
-            let ids = ["training_unlock"]
+            let ids = ["training_access_unlock"]
             let storeProducts = try await Product.products(for: ids)
             products = storeProducts
 
-            // Проверка уже купленных
+            // Checking already purchased items
             for await result in Transaction.currentEntitlements {
                 if let transaction = try? result.payloadValue {
                     purchasedProductIDs.insert(transaction.productID)

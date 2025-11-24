@@ -30,6 +30,12 @@ enum Texts {
     static let done: LocalizedStringKey = "done"
     static let wordsLeft: LocalizedStringKey = "wordsLeft"
     static let newWordsNumber: LocalizedStringKey = "newWordsNumber"
+    static let trainingAccess: LocalizedStringKey = "trainingAccess"
+    static let accessExpired: LocalizedStringKey = "accessExpired"
+    static let unlockAccess: LocalizedStringKey = "unlockAccess"
+    static let unlockFor: LocalizedStringKey = "unlockFor"
+    static let loadPrice: LocalizedStringKey = "loadPrice"
+    static let restore: LocalizedStringKey = "restore"
 
     static var allWords: String {
         NSLocalizedString("allWords", comment: "")
@@ -73,5 +79,17 @@ enum Texts {
 
     static var staleWords: String {
         NSLocalizedString("staleWords", comment: "")
+    }
+
+    static var errorPurchase: String {
+        NSLocalizedString("errorPurchase", comment: "")
+    }
+
+    static var purchaseRestored: String {
+        NSLocalizedString("purchaseRestored", comment: "")
+    }
+
+    static var noPurchase: String {
+        NSLocalizedString("noPurchase", comment: "")
     }
 }

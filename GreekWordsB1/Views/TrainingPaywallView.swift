@@ -5,16 +5,18 @@ struct TrainingPaywallView: View {
     @EnvironmentObject var purchaseManager: PurchaseManager
     @EnvironmentObject var trainingAccess: TrainingAccessManager
     @Environment(\.horizontalSizeClass) var sizeClass
+    @Environment(\.dismiss) var dismiss
 
     @State private var purchasing = false
     @State private var errorMessage: String?
+    @State private var product: Product?
 
     private var buttonHeight: CGFloat {
-        sizeClass == .regular ? 60 : 55
+        sizeClass == .regular ? 120 : 90
     }
 
     private var cornerRadius: CGFloat {
-        sizeClass == .regular ? 30 : 25
+        sizeClass == .regular ? 50 : 40
     }
 
     private var horizontalPadding: CGFloat {
@@ -26,59 +28,69 @@ struct TrainingPaywallView: View {
             Color.gray.opacity(0.05)
                 .ignoresSafeArea()
 
-            VStack(spacing: 24) {
-
-                Text("Training Access Expired")
+            VStack(spacing: 40) {
+                Text(Texts.accessExpired)
                     .font(sizeClass == .regular ? .largeTitle : .title)
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.center)
                     .fontWeight(.semibold)
-                    .padding(.top, sizeClass == .regular ? 40 : 20)
+                    .padding(.horizontal, 32)
+                    .padding(.top, 32)
 
-                Text("Unlock unlimited access to Training with a one-time purchase.")
-                    .font(.body)
+                Text(Texts.unlockAccess)
+                    .font(sizeClass == .regular ? .headline : .subheadline)
                     .foregroundColor(.primary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
 
-                // Purchase Button
-                if let product = purchaseManager.products.first(where: { $0.id == "training_unlock" }) {
+                Group {
+                    if let product {
+                        Button {
+                            Task {
+                                purchasing = true
+                                let success = await purchaseManager.purchase(product)
+                                purchasing = false
 
-                    Button {
-                        Task {
-                            purchasing = true
-                            let success = await purchaseManager.purchase(product)
-                            purchasing = false
-
-                            if success {
-                                trainingAccess.setUnlocked()
-                            } else {
-                                errorMessage = "Purchase failed. Please try again."
+                                if success {
+                                    trainingAccess.setUnlocked()
+                                    dismiss()
+                                } else {
+                                    errorMessage = Texts.errorPurchase
+                                }
                             }
-                        }
-                    } label: {
-                        Text(purchasing ? "Processing…" : "Unlock for \(product.displayPrice)")
-                            .frame(maxWidth: .infinity)
-                            .frame(height: buttonHeight)
-                            .background(Color.blue.opacity(0.2))
-                            .foregroundColor(.primary)
-                            .cornerRadius(cornerRadius)
-                    }
-                    .padding(.horizontal, horizontalPadding)
-                    .disabled(purchasing)
+                        } label: {
+                            VStack(spacing: 4) {
+                                Text(Texts.unlockFor)
+                                    .font(sizeClass == .regular ? .title2 : .title3)
+                                    .foregroundColor(.primary)
 
-                } else {
-                    ProgressView("Loading price…")
-                        .padding(.top, 8)
+                                Text(product.displayPrice)
+                                    .font(sizeClass == .regular ? .largeTitle : .title)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.primary)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
+                        }
+                        .disabled(purchasing)
+
+                    } else {
+                        ProgressView(Texts.loadPrice)
+                            .frame(maxWidth: .infinity)
+                    }
                 }
+                .padding(.horizontal, horizontalPadding)
+                .animation(nil, value: purchasing)
 
                 if let errorMessage {
                     Text(errorMessage)
                         .foregroundColor(.red)
                         .font(.footnote)
-                        .padding(.top, 4)
                 }
 
-                Spacer()
             }
+            .frame(maxHeight: .infinity, alignment: .center)
+            .offset(y: -40)
         }
         .background(
             Image(.pillar)
@@ -90,10 +102,13 @@ struct TrainingPaywallView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
-                Text("Training")
+                Text(Texts.trainingAccess)
                     .font(sizeClass == .regular ? .largeTitle : .title2)
                     .foregroundColor(.primary)
             }
+        }
+        .onReceive(purchaseManager.$products) { products in
+            product = products.first(where: { $0.id == "training_access_unlock" })
         }
     }
 }
