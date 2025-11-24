@@ -4,6 +4,7 @@ struct SettingsView: View {
     @State private var currentLanguage = Locale.current.language.languageCode?.identifier ?? "en"
     @Environment(\.horizontalSizeClass) var sizeClass
     @AppStorage("isBlurEnabled") private var isBlurEnabled = false
+    @AppStorage("dailyNewWordsLimit") private var dailyNewWordsLimit: Int = 20
 
     var body: some View {
         ZStack {
@@ -40,6 +41,26 @@ struct SettingsView: View {
                     isOn: $isBlurEnabled,
                     label: isBlurEnabled ? Texts.blurOn : Texts.blurOff
                 )
+
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(spacing: 14) {
+                        Image(systemName: "character.book.closed")
+                            .font(.body)
+                            .imageScale(.large)
+                            .foregroundColor(.primary)
+
+                        Text(Texts.newWordsNumber)
+                            .font(.body)
+                            .foregroundColor(.primary)
+                    }
+
+                    GlassSegmentedControl(
+                        items: [10, 20, 30],
+                        label: { "\($0)" },
+                        selection: $dailyNewWordsLimit
+                    )
+                }
+                .padding(.vertical, 8)
             }
         }
         .navigationTitle("")

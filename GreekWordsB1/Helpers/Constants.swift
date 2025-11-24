@@ -28,6 +28,7 @@ enum Texts {
     static let reviewWords: LocalizedStringKey = "reviewWords"
     static let done: LocalizedStringKey = "done"
     static let wordsLeft: LocalizedStringKey = "wordsLeft"
+    static let newWordsNumber: LocalizedStringKey = "newWordsNumber"
 
     static var allWords: String {
         NSLocalizedString("allWords", comment: "")

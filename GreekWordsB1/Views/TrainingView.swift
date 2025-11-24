@@ -297,6 +297,7 @@ struct TrainingView: View {
             progresses = progresses.filter { allowedIDs.contains($0.compositeID) }
 
             // Get today's FSRS selection
+            scheduler.trimAssignedNewWordsIfNeeded(progresses)
             let todaysProgresses = scheduler.wordsForToday(from: progresses)
             let newCount = todaysProgresses.filter { $0.state == .new }.count
             let totalCount = todaysProgresses.count

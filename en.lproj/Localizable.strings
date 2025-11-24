@@ -62,3 +62,4 @@ To open a group, complete at least one topic in the Quiz section.";
 "reviewWords" = "Review words";
 "done" = "All the words are done!";
 "wordsLeft" = "Words left: ";
+"newWordsNumber" = "New words per day";

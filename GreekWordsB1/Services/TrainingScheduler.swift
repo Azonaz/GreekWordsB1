@@ -11,11 +11,18 @@ final class TrainingScheduler {
         )
     )
 
+    private var dailyNewWordsLimit: Int {
+        let value = UserDefaults.standard.integer(forKey: "dailyNewWordsLimit")
+        return value > 0 ? value : 20
+    }
+
     /// Selects the words to be displayed today:
     /// - new (state == .new)
     /// - words whose repetition period has come (due <= now)
     /// - limits the number of new
-    func wordsForToday(from all: [WordProgress], newLimit: Int = 20) -> [WordProgress] {
+    func wordsForToday(from all: [WordProgress]) -> [WordProgress] {
+        // Read user setting for daily limit of new words
+        let newLimit = dailyNewWordsLimit
         let now = Date()
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: now)
@@ -69,6 +76,28 @@ final class TrainingScheduler {
         }
 
         return todaysNewWords + dueWords
+    }
+
+    func trimAssignedNewWordsIfNeeded(_ progresses: [WordProgress]) {
+        let limit = dailyNewWordsLimit
+        let now = Date()
+        let today = Calendar.current.startOfDay(for: now)
+
+        let assignedToday = progresses.filter { progress in
+            if let date = progress.assignedDate {
+                return Calendar.current.isDate(date, inSameDayAs: today)
+            }
+            return false
+        }
+
+        let newAssigned = assignedToday.filter { $0.state == .new }
+
+        if newAssigned.count > limit {
+            let extra = newAssigned.count - limit
+            for progress in newAssigned.suffix(extra) {
+                progress.assignedDate = nil
+            }
+        }
     }
 
     /// FSRS-correct calculation of the next state
