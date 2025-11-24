@@ -90,22 +90,3 @@ struct GroupsListView: View {
         return (seen, total)
     }
 }
-
-#Preview {
-    let schema = Schema([GroupMeta.self, Word.self, WordProgress.self])
-    let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-
-    guard let container = try? ModelContainer(for: schema, configurations: [config]) else {
-        return Text("Container creation error")
-    }
-
-    let ctx = ModelContext(container)
-    ctx.insert(GroupMeta(id: 1, version: 1, nameEn: "Meeting", nameRu: "Встреча"))
-    ctx.insert(GroupMeta(id: 2, version: 1, nameEn: "Family", nameRu: "Семья"))
-    ctx.insert(GroupMeta(id: 3, version: 2, nameEn: "Travel", nameRu: "Путешествия"))
-
-    return NavigationStack {
-        GroupsListView()
-    }
-    .modelContainer(container)
-}

@@ -2,11 +2,13 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
+    @EnvironmentObject var trainingAccess: TrainingAccessManager
     @Environment(\.modelContext) private var context
-    @State private var showCategories = false
     @Environment(\.horizontalSizeClass) var sizeClass
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.scenePhase) private var scenePhase
+    @State private var goTraining = false
+    @State private var goPaywall = false
 
     private var buttonHeight: CGFloat {
         sizeClass == .regular ? 100 : 80
@@ -45,13 +47,28 @@ struct ContentView: View {
                     }
                     .padding(.horizontal, buttonPaddingHorizontal)
 
-                    NavigationLink(destination: TrainingView()) {
+                    Button {
+                        trainingAccess.startTrialIfNeeded()
+                        trainingAccess.refreshState()
+
+                        if trainingAccess.hasAccess {
+                            goTraining = true
+                        } else {
+                            goPaywall = true
+                        }
+                    } label: {
                         Text(Texts.training)
                             .foregroundColor(.primary)
                             .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
                     }
                     .padding(.top, topPadding)
                     .padding(.horizontal, buttonPaddingHorizontal)
+                    .navigationDestination(isPresented: $goTraining) {
+                        TrainingView()
+                    }
+                    .navigationDestination(isPresented: $goPaywall) {
+                        TrainingPaywallView()
+                    }
 
                     Spacer()
 
@@ -116,9 +133,4 @@ struct ContentView: View {
             print("Synchronisation error: \(error)")
         }
     }
-}
-
-#Preview {
-    ContentView()
-        .modelContainer(for: [Word.self, GroupMeta.self, WordProgress.self, QuizStats.self])
 }

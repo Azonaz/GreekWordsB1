@@ -4,6 +4,7 @@ import SwiftData
 @main
 struct GreekWordsB1App: App {
     @State private var showLaunchScreen = true
+    @StateObject private var trainingAccess = TrainingAccessManager()
 
     var body: some Scene {
         WindowGroup {
@@ -18,6 +19,7 @@ struct GreekWordsB1App: App {
                     }
             } else {
                 ContentView()
+                    .environmentObject(trainingAccess)
                     .modelContainer(for: [Word.self, GroupMeta.self, WordProgress.self, QuizStats.self])
             }
         }

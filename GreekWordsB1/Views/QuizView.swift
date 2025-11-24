@@ -297,38 +297,3 @@ struct QuizView: View {
         }
     }
 }
-
-#Preview {
-    let schema = Schema([GroupMeta.self, Word.self, WordProgress.self])
-    let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-
-    guard let container = try? ModelContainer(for: schema, configurations: [config]) else {
-        return Text("Container creation error")
-    }
-
-    let context = ModelContext(container)
-
-    let mockGroup = GroupMeta(id: 1, version: 1, nameEn: "Family", nameRu: "Семья")
-    context.insert(mockGroup)
-
-    let mockWords = [
-        Word(localID: 1, groupID: 1, gr: "μητέρα", en: "mother", ru: "мама"),
-        Word(localID: 2, groupID: 1, gr: "πατέρας", en: "father", ru: "папа"),
-        Word(localID: 3, groupID: 1, gr: "αδελφός", en: "brother", ru: "брат"),
-        Word(localID: 4, groupID: 1, gr: "αδελφή", en: "sister", ru: "сестра"),
-        Word(localID: 5, groupID: 1, gr: "γιος", en: "son", ru: "сын"),
-        Word(localID: 6, groupID: 1, gr: "κόρη", en: "daughter", ru: "дочь")
-    ]
-    mockWords.forEach { context.insert($0) }
-
-    do {
-        try context.save()
-    } catch {
-        print("Context saving error: \(error)")
-    }
-
-    return NavigationStack {
-        QuizView(group: mockGroup)
-    }
-    .modelContainer(container)
-}
