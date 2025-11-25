@@ -68,21 +68,7 @@ final class TrainingAccessManager: ObservableObject {
         }
     }
 
-    /// Placeholder, the actual purchase will be later.
-    func markAsUnlockedForDebug() {
-        kvs.set(true, forKey: unlockKey)
-        kvs.synchronize()
-        refreshState()
-    }
-
-    /// Reset (for tests)
-    func resetTrialForDebug() {
-//        kvs.removeObject(forKey: trialStartKey)
-        kvs.removeObject(forKey: unlockKey)
-        kvs.synchronize()
-        refreshState()
-    }
-
+    /// Unlock access
     func setUnlocked() {
         kvs.set(true, forKey: unlockKey)
         kvs.synchronize()

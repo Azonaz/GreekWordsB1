@@ -4,7 +4,6 @@ import Combine
 
 @MainActor
 final class PurchaseManager: ObservableObject {
-
     @Published var products: [Product] = []
     @Published var purchasedProductIDs: Set<String> = []
 

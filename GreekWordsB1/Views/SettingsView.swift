@@ -125,11 +125,6 @@ struct SettingsView: View {
                             .font(.footnote)
                     }
                 }
-
-                // Reset access for testing
-                Button("Reset Training Access") {
-                    trainingAccess.resetTrialForDebug()
-                }
             }
         }
         .navigationTitle("")
