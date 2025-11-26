@@ -63,6 +63,7 @@ struct StatisticsView: View {
                     VStack(spacing: 16) {
                         StatCard(title: Texts.wordsLearn, value: "\(studyingCount)")
                         StatCard(title: Texts.wordsLearned, value: "\(learnedCount)")
+
                         if weakWordsCount > 0 {
                             if trainingAccess.hasAccess {
                                 StatCardWithButton(
@@ -90,6 +91,7 @@ struct StatisticsView: View {
                         } else {
                             StatCard(title: Texts.weakWords, value: "0")
                         }
+
                         if staleWordsCount > 0 {
                             if trainingAccess.hasAccess {
                                 StatCardWithButton(
@@ -115,7 +117,7 @@ struct StatisticsView: View {
                                 StatCard(title: Texts.staleWords, value: "0")
                             }
                         } else {
-                            StatCard(title: Texts.weakWords, value: "0")
+                            StatCard(title: Texts.staleWords, value: "0")
                         }
                     }
                     .padding(.horizontal, horizontalPadding)

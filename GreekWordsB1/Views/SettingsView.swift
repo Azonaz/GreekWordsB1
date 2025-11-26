@@ -6,6 +6,7 @@ struct SettingsView: View {
     @Environment(\.horizontalSizeClass) var sizeClass
     @AppStorage("isBlurEnabled") private var isBlurEnabled = false
     @AppStorage("dailyNewWordsLimit") private var dailyNewWordsLimit: Int = 20
+    @AppStorage("shouldShowRateButton") private var shouldShowRateButton = false
 
     @EnvironmentObject var trainingAccess: TrainingAccessManager
     @EnvironmentObject var purchaseManager: PurchaseManager
@@ -123,6 +124,33 @@ struct SettingsView: View {
                         Text(restoreMessage)
                             .foregroundColor(.secondary)
                             .font(.footnote)
+                    }
+                }
+
+                // Rate the app
+                if shouldShowRateButton {
+                    HStack(spacing: 14) {
+                        Image(systemName: "star.fill")
+                            .font(.body)
+                            .imageScale(.large)
+                            .foregroundColor(.primary)
+
+                        Text(Texts.rateApp)
+                            .font(.body)
+                            .foregroundColor(.primary)
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.primary)
+                    }
+                    .padding(.vertical, 8)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        if let url = URL(string: appRate) {
+                            UIApplication.shared.open(url)
+                        }
+                        shouldShowRateButton = false
                     }
                 }
             }

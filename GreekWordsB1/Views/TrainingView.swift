@@ -23,6 +23,9 @@ struct TrainingView: View {
     @State private var todayReview = 0
     @State private var todayLearning = 0
     @State private var wordStates: [String: ReviewState] = [:]
+    
+    @AppStorage("trainingCount") private var trainingCount = 0
+    @AppStorage("shouldShowRateButton") private var shouldShowRateButton = false
 
     private var todayTotal: Int {
         max(dueWords.count - currentIndex, 0)
@@ -369,6 +372,10 @@ struct TrainingView: View {
                     showTranslation = false
                 } else {
                     finished = true
+                    trainingCount += 1
+                    if trainingCount == 5 {
+                        shouldShowRateButton = true
+                    }
                 }
 
                 if let state = wordStates[word.compositeID] {

@@ -1,6 +1,7 @@
 import SwiftUI
 
 let baseURL = "https://azonaz.github.io/words-gr-b1.json"
+let appRate = "https://apps.apple.com/app/greek-words-b1/id6754924042?action=write-review"
 
 enum Texts {
     static let quiz: LocalizedStringKey = "quiz"
@@ -36,6 +37,7 @@ enum Texts {
     static let unlockFor: LocalizedStringKey = "unlockFor"
     static let loadPrice: LocalizedStringKey = "loadPrice"
     static let restore: LocalizedStringKey = "restore"
+    static let rateApp: LocalizedStringKey = "rateApp"
 
     static var allWords: String {
         NSLocalizedString("allWords", comment: "")
