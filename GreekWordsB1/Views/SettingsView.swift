@@ -1,16 +1,32 @@
 import SwiftUI
+import StoreKit
 
 struct SettingsView: View {
     @State private var currentLanguage = Locale.current.language.languageCode?.identifier ?? "en"
     @Environment(\.horizontalSizeClass) var sizeClass
     @AppStorage("isBlurEnabled") private var isBlurEnabled = false
+    @AppStorage("dailyNewWordsLimit") private var dailyNewWordsLimit: Int = 20
+
+    @EnvironmentObject var trainingAccess: TrainingAccessManager
+    @EnvironmentObject var purchaseManager: PurchaseManager
+
+    @State private var restoring = false
+    @State private var restoreMessage: String?
+
+    private var cornerRadius: CGFloat {
+        sizeClass == .regular ? 25 : 20
+    }
+
+    private var buttonHeight: CGFloat {
+        sizeClass == .regular ? 55 : 50
+    }
 
     var body: some View {
         ZStack {
-            Color.gray.opacity(0.05)
-                .ignoresSafeArea()
+            Color.gray.opacity(0.05).ignoresSafeArea()
 
             List {
+                // Selecting the application language
                 Button {
                     openAppSettings()
                 } label: {
@@ -36,10 +52,79 @@ struct SettingsView: View {
                     .padding(.vertical, 8)
                 }
 
+                // Enable blur - hide answers until tapped
                 GlassToggle(
                     isOn: $isBlurEnabled,
                     label: isBlurEnabled ? Texts.blurOn : Texts.blurOff
                 )
+
+                // Set the number of new words per day in training
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack(spacing: 14) {
+                        Image(systemName: "character.book.closed")
+                            .font(.body)
+                            .imageScale(.large)
+                            .foregroundColor(.primary)
+
+                        Text(Texts.newWordsNumber)
+                            .font(.body)
+                            .foregroundColor(.primary)
+                    }
+
+                    GlassSegmentedControl(
+                        items: [10, 20, 30],
+                        label: { "\($0)" },
+                        selection: $dailyNewWordsLimit
+                    )
+                }
+                .padding(.vertical, 8)
+
+                // Purchase recovery
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 14) {
+                        Image(systemName: "lock.open")
+                            .font(.body)
+                            .imageScale(.large)
+                            .foregroundColor(.primary)
+
+                        Text(Texts.restore)
+                            .font(.body)
+                            .foregroundColor(.primary)
+
+                        Spacer()
+
+                        if restoring {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle())
+                        } else if restoreMessage == Texts.purchaseRestored {
+                            Image(systemName: "checkmark")
+                                .font(.body)
+                                .imageScale(.large)
+                                .foregroundColor(.primary)
+                        }
+                    }
+                    .padding(.vertical, 8)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        Task {
+                            restoring = true
+                            restoreMessage = nil
+
+                            let restored = await restorePurchases()
+
+                            restoring = false
+                            restoreMessage = restored
+                                ? Texts.purchaseRestored
+                            : Texts.noPurchase
+                        }
+                    }
+
+                    if let restoreMessage {
+                        Text(restoreMessage)
+                            .foregroundColor(.secondary)
+                            .font(.footnote)
+                    }
+                }
             }
         }
         .navigationTitle("")
@@ -54,6 +139,21 @@ struct SettingsView: View {
         .onAppear {
             updateLanguage()
         }
+    }
+
+    private func restorePurchases() async -> Bool {
+        var restored = false
+
+        for await result in Transaction.currentEntitlements {
+            if let transaction = try? result.payloadValue {
+                purchaseManager.purchasedProductIDs.insert(transaction.productID)
+                await transaction.finish()
+                trainingAccess.setUnlocked()
+                restored = true
+            }
+        }
+
+        return restored
     }
 
     private func openAppSettings() {
@@ -74,8 +174,4 @@ struct SettingsView: View {
         default: return code.uppercased()
         }
     }
-}
-
-#Preview {
-    SettingsView()
 }

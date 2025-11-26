@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import FSRS
 
 final class VocabularySyncService {
     private let context: ModelContext
@@ -31,7 +32,6 @@ private extension VocabularySyncService {
         ).first
 
         if let existingMeta = existingMeta, existingMeta.version >= group.version {
-            // If the version is the same or greater, we don't need to update
             return
         }
 
@@ -63,6 +63,24 @@ private extension VocabularySyncService {
                 ru: word.ru
             )
             context.insert(newWord)
+
+            // Add progress for each word
+            let compositeID = newWord.compositeID
+            let existingProgress = try context.fetch(
+                FetchDescriptor<WordProgress>(
+                    predicate: #Predicate { $0.compositeID == compositeID }
+                )
+            ).first
+
+            if existingProgress == nil {
+                let progress = WordProgress(
+                    compositeID: compositeID,
+                    learned: false,
+                    correctAnswers: 0,
+                    seen: false,
+                )
+                context.insert(progress)
+            }
         }
     }
 }

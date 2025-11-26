@@ -2,11 +2,13 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
+    @EnvironmentObject var trainingAccess: TrainingAccessManager
     @Environment(\.modelContext) private var context
-    @State private var showCategories = false
     @Environment(\.horizontalSizeClass) var sizeClass
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.scenePhase) private var scenePhase
+    @State private var goTraining = false
+    @State private var goPaywall = false
 
     private var buttonHeight: CGFloat {
         sizeClass == .regular ? 100 : 80
@@ -45,55 +47,28 @@ struct ContentView: View {
                     }
                     .padding(.horizontal, buttonPaddingHorizontal)
 
-                    ZStack(alignment: .bottomTrailing) {
+                    Button {
+                        trainingAccess.startTrialIfNeeded()
+                        trainingAccess.refreshState()
+
+                        if trainingAccess.hasAccess {
+                            goTraining = true
+                        } else {
+                            goPaywall = true
+                        }
+                    } label: {
                         Text(Texts.training)
+                            .foregroundColor(.primary)
                             .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
-                            .overlay(
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .fill(
-                                            LinearGradient(
-                                                gradient: Gradient(colors:
-                                                    colorScheme == .dark
-                                                    ? [
-                                                        Color.white.opacity(0.10),
-                                                        Color.white.opacity(0.45)
-                                                    ]
-                                                    : [
-                                                        Color.white.opacity(0.30),
-                                                        Color.black.opacity(0.05)
-                                                    ]
-                                                ),
-                                                startPoint: .topLeading,
-                                                endPoint: .bottomTrailing
-                                            )
-                                        )
-                                        .background(.ultraThinMaterial)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 10)
-                                                .strokeBorder(
-                                                    .darkRed,
-                                                    lineWidth: 0.6
-                                                )
-                                        )
-                                        .clipShape(RoundedRectangle(cornerRadius: 10))
-                                        .frame(width: 120, height: 38)
-                                        .overlay(
-                                            Text(Texts.soon)
-                                                .font(.headline.weight(.semibold))
-                                                .foregroundColor(.darkRed)
-                                                .shadow(color: Color.darkRed.opacity(0.7), radius: 4)
-                                                .shadow(color: Color.white.opacity(colorScheme == .dark ? 0.4 : 0.2),
-                                                        radius: 1)
-                                        )
-                                        .rotationEffect(.degrees(-10))
-                                        .offset(x: 10, y: 8)
-                                },
-                                alignment: .bottomTrailing
-                            )
                     }
                     .padding(.top, topPadding)
                     .padding(.horizontal, buttonPaddingHorizontal)
+                    .navigationDestination(isPresented: $goTraining) {
+                        TrainingView()
+                    }
+                    .navigationDestination(isPresented: $goPaywall) {
+                        TrainingPaywallView()
+                    }
 
                     Spacer()
 
@@ -158,9 +133,4 @@ struct ContentView: View {
             print("Synchronisation error: \(error)")
         }
     }
-}
-
-#Preview {
-    ContentView()
-        .modelContainer(for: [Word.self, GroupMeta.self, WordProgress.self, QuizStats.self])
 }

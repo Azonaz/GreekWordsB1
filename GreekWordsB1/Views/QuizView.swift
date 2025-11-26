@@ -63,7 +63,9 @@ struct QuizView: View {
             }
         }
         .onAppear {
+            context.autosaveEnabled = true
             haptic.prepare()
+            markGroupAsOpened()
             startQuiz()
         }
         .alert(isPresented: $showResult) {
@@ -157,6 +159,17 @@ struct QuizView: View {
             }
     }
 
+    private func markGroupAsOpened() {
+        if !group.opened {
+            group.opened = true
+            do {
+                try context.save()
+            } catch {
+                print("Error when saving the opened-flag: \(error)")
+            }
+        }
+    }
+
     private func startQuiz() {
         guard words.count >= 10 else { return }
         quizWords = Array(words.shuffled().prefix(10))
@@ -183,6 +196,19 @@ struct QuizView: View {
     private func handleTap(_ word: Word) {
         guard selectedWord == nil else { return }
         isInteractionDisabled = true
+
+        if let currentWord {
+            let id = currentWord.compositeID
+            let descriptor = FetchDescriptor<WordProgress>(
+                predicate: #Predicate { $0.compositeID == id }
+            )
+
+            if let progress = try? context.fetch(descriptor).first {
+                progress.seen = true
+            } else {
+                context.insert(WordProgress(compositeID: id, seen: true))
+            }
+        }
 
         selectedWord = word
         let correct = (word.compositeID == currentWord?.compositeID)
@@ -235,33 +261,24 @@ struct QuizView: View {
         } else {
             context.insert(QuizStats(completedCount: 1, totalScore: result))
         }
-
-        for word in quizWords {
-            let id = word.compositeID
-            let descriptor = FetchDescriptor<WordProgress>(
-                predicate: #Predicate { $0.compositeID == id }
-            )
-
-            if let wordProgress = try? context.fetch(descriptor).first {
-                wordProgress.seen = true
-            } else {
-                context.insert(WordProgress(compositeID: id, seen: true))
-            }
-        }
-
-        do {
-            try context.save()
-        } catch {
-            print("Error saving statistics: \(error)")
-        }
     }
 
     private func highlightColors(for word: Word) -> [Color]? {
-        guard let selectedWord else { return nil }
-        if word.compositeID != selectedWord.compositeID { return nil }
+        guard let currentWord else { return nil }
+
+        // correct highlighting in case of error
+        if isCorrect == false, word.compositeID == currentWord.compositeID {
+            return [.green.opacity(0.4), .green.opacity(0.7), .green.opacity(0.4)]
+        }
+
+        // highlighting of the selected option (red or green)
+        guard let selectedWord, word.compositeID == selectedWord.compositeID else {
+            return nil
+        }
+
         return isCorrect == true
-        ? [.green.opacity(0.4), .green.opacity(0.7), .green.opacity(0.4)]
-        : [.red.opacity(0.4), .red.opacity(0.8), .red.opacity(0.4)]
+            ? [.green.opacity(0.4), .green.opacity(0.7), .green.opacity(0.4)]
+            : [.red.opacity(0.4), .red.opacity(0.8), .red.opacity(0.4)]
     }
 
     private func shake() {
@@ -279,39 +296,4 @@ struct QuizView: View {
             withAnimation(.default.speed(3)) { shakeOffset = 0 }
         }
     }
-}
-
-#Preview {
-    let schema = Schema([GroupMeta.self, Word.self, WordProgress.self])
-    let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-
-    guard let container = try? ModelContainer(for: schema, configurations: [config]) else {
-        return Text("Container creation error")
-    }
-
-    let context = ModelContext(container)
-
-    let mockGroup = GroupMeta(id: 1, version: 1, nameEn: "Family", nameRu: "Семья")
-    context.insert(mockGroup)
-
-    let mockWords = [
-        Word(localID: 1, groupID: 1, gr: "μητέρα", en: "mother", ru: "мама"),
-        Word(localID: 2, groupID: 1, gr: "πατέρας", en: "father", ru: "папа"),
-        Word(localID: 3, groupID: 1, gr: "αδελφός", en: "brother", ru: "брат"),
-        Word(localID: 4, groupID: 1, gr: "αδελφή", en: "sister", ru: "сестра"),
-        Word(localID: 5, groupID: 1, gr: "γιος", en: "son", ru: "сын"),
-        Word(localID: 6, groupID: 1, gr: "κόρη", en: "daughter", ru: "дочь")
-    ]
-    mockWords.forEach { context.insert($0) }
-
-    do {
-        try context.save()
-    } catch {
-        print("Context saving error: \(error)")
-    }
-
-    return NavigationStack {
-        QuizView(group: mockGroup)
-    }
-    .modelContainer(container)
 }
