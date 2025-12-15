@@ -26,6 +26,9 @@ struct GroupsListView: View {
     }
 
     var body: some View {
+        let wordsByGroup = Dictionary(grouping: words, by: \.groupID)
+        let seenIDs = Set(progresses.filter { $0.seen }.map(\.compositeID))
+
         ZStack {
             Color.gray.opacity(0.05)
                 .ignoresSafeArea()
@@ -34,7 +37,7 @@ struct GroupsListView: View {
                 VStack(spacing: 16) {
                     ForEach(groups) { group in
                         NavigationLink(destination: QuizView(group: group)) {
-                            let counts = countForGroup(group)
+                            let counts = countForGroup(group, wordsByGroup: wordsByGroup, seenIDs: seenIDs)
                             let counterText = "\(counts.seen)/\(counts.total)"
 
                             HStack(alignment: .center) {
@@ -77,16 +80,15 @@ struct GroupsListView: View {
         }
     }
 
-    private func countForGroup(_ group: GroupMeta) -> (seen: Int, total: Int) {
-        let groupWords = words.filter { $0.groupID == group.id }
-        let total = groupWords.count
-
+    private func countForGroup(_ group: GroupMeta, wordsByGroup: [Int: [Word]],
+                               seenIDs: Set<String>) -> (seen: Int, total: Int) {
+        let groupWords = wordsByGroup[group.id] ?? []
         let seen = groupWords.reduce(into: 0) { result, word in
-            if progresses.first(where: { $0.compositeID == word.compositeID })?.seen == true {
+            if seenIDs.contains(word.compositeID) {
                 result += 1
             }
         }
 
-        return (seen, total)
+        return (seen, groupWords.count)
     }
 }
