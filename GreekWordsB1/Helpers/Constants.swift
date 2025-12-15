@@ -38,6 +38,9 @@ enum Texts {
     static let loadPrice: LocalizedStringKey = "loadPrice"
     static let restore: LocalizedStringKey = "restore"
     static let rateApp: LocalizedStringKey = "rateApp"
+    static let reverseQuiz: LocalizedStringKey = "reverseQuiz"
+    static let reverseQuizInfo: LocalizedStringKey = "reverseQuizInfo"
+    static let reverseQuizHelp: LocalizedStringKey = "reverseQuizHelp"
 
     static var allWords: String {
         NSLocalizedString("allWords", comment: "")

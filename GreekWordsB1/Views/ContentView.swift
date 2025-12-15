@@ -47,6 +47,14 @@ struct ContentView: View {
                     }
                     .padding(.horizontal, buttonPaddingHorizontal)
 
+                    NavigationLink(destination: GroupsListView(mode: .reverse)) {
+                        Text(Texts.reverseQuiz)
+                            .foregroundColor(.primary)
+                            .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
+                    }
+                    .padding(.top, topPadding)
+                    .padding(.horizontal, buttonPaddingHorizontal)
+
                     Button {
                         trainingAccess.startTrialIfNeeded()
                         trainingAccess.refreshState()

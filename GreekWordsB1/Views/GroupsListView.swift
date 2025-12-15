@@ -1,7 +1,13 @@
 import SwiftUI
 import SwiftData
 
+enum QuizMode {
+    case direct
+    case reverse
+}
+
 struct GroupsListView: View {
+    let mode: QuizMode
     @Query(sort: [SortDescriptor(\GroupMeta.id, order: .forward)]) private var groups: [GroupMeta]
     @Query private var words: [Word]
     @Query private var progresses: [WordProgress]
@@ -25,6 +31,10 @@ struct GroupsListView: View {
         Locale.preferredLanguages.first?.hasPrefix("en") == true
     }
 
+    init(mode: QuizMode = .direct) {
+        self.mode = mode
+    }
+
     var body: some View {
         let wordsByGroup = Dictionary(grouping: words, by: \.groupID)
         let seenIDs = Set(progresses.filter { $0.seen }.map(\.compositeID))
@@ -36,7 +46,7 @@ struct GroupsListView: View {
             ScrollView {
                 VStack(spacing: 16) {
                     ForEach(groups) { group in
-                        NavigationLink(destination: QuizView(group: group)) {
+                        NavigationLink(destination: destination(for: group)) {
                             let counts = countForGroup(group, wordsByGroup: wordsByGroup, seenIDs: seenIDs)
                             let counterText = "\(counts.seen)/\(counts.total)"
 
@@ -90,5 +100,15 @@ struct GroupsListView: View {
         }
 
         return (seen, groupWords.count)
+    }
+
+    @ViewBuilder
+    private func destination(for group: GroupMeta) -> some View {
+        switch mode {
+        case .direct:
+            QuizView(group: group)
+        case .reverse:
+            ReverseQuizView(group: group)
+        }
     }
 }
