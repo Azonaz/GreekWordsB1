@@ -3,6 +3,7 @@ import SwiftData
 
 struct QuizView: View {
     let group: GroupMeta
+    let mode: QuizMode
     @Query var words: [Word]
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
@@ -36,8 +37,9 @@ struct QuizView: View {
         sizeClass == .regular ? 40 : 30
     }
 
-    init(group: GroupMeta) {
+    init(group: GroupMeta, mode: QuizMode = .direct) {
         self.group = group
+        self.mode = mode
         let groupID = group.id
         _words = Query(filter: #Predicate<Word> { $0.groupID == groupID })
     }
@@ -86,15 +88,16 @@ struct QuizView: View {
             }
         }
     }
+}
 
+private extension QuizView {
     @ViewBuilder
-    private var quizContent: some View {
+    var quizContent: some View {
         if let currentWord {
             if sizeClass == .compact && vSizeClass == .compact {
-                // landscape mode for phone
                 GeometryReader { geo in
                     HStack(spacing: 16) {
-                        Text(currentWord.gr)
+                        Text(promptText(for: currentWord))
                             .font(.largeTitle.bold())
                             .multilineTextAlignment(.center)
                             .lineLimit(nil)
@@ -115,9 +118,8 @@ struct QuizView: View {
                 }
                 .frame(height: 220)
             } else {
-                // portrait mode
                 VStack(spacing: 20) {
-                    Text(currentWord.gr)
+                    Text(promptText(for: currentWord))
                         .font(.largeTitle.bold())
                         .multilineTextAlignment(.center)
                         .lineLimit(nil)
@@ -138,8 +140,8 @@ struct QuizView: View {
     }
 
     @ViewBuilder
-    private func answerView(for word: Word, height: CGFloat) -> some View {
-        Text(isEnglish ? word.en : word.ru)
+    func answerView(for word: Word, height: CGFloat) -> some View {
+        Text(optionText(for: word))
             .offset(x: (isCorrect == false && word.compositeID == selectedWord?.compositeID) ? shakeOffset : 0)
             .font(.title3)
             .foregroundColor(.primary)
@@ -159,7 +161,7 @@ struct QuizView: View {
             }
     }
 
-    private func markGroupAsOpened() {
+    func markGroupAsOpened() {
         if !group.opened {
             group.opened = true
             do {
@@ -170,7 +172,7 @@ struct QuizView: View {
         }
     }
 
-    private func startQuiz() {
+    func startQuiz() {
         guard words.count >= 10 else { return }
         quizWords = Array(words.shuffled().prefix(10))
         currentIndex = 0
@@ -182,7 +184,7 @@ struct QuizView: View {
         setupRound()
     }
 
-    private func setupRound() {
+    func setupRound() {
         guard let currentWord else { return }
         let others = words.filter { $0.compositeID != currentWord.compositeID }.shuffled()
         let newOptions = ([currentWord] + others.prefix(2)).shuffled()
@@ -193,7 +195,7 @@ struct QuizView: View {
         }
     }
 
-    private func handleTap(_ word: Word) {
+    func handleTap(_ word: Word) {
         guard selectedWord == nil else { return }
         isInteractionDisabled = true
 
@@ -252,7 +254,7 @@ struct QuizView: View {
         }
     }
 
-    private func saveQuizResult() {
+    func saveQuizResult() {
         let result = Int((Double(correctCount) / Double(quizWords.count)) * 100)
 
         if let stats = try? context.fetch(FetchDescriptor<QuizStats>()).first {
@@ -263,15 +265,13 @@ struct QuizView: View {
         }
     }
 
-    private func highlightColors(for word: Word) -> [Color]? {
+    func highlightColors(for word: Word) -> [Color]? {
         guard let currentWord else { return nil }
 
-        // correct highlighting in case of error
         if isCorrect == false, word.compositeID == currentWord.compositeID {
             return [.green.opacity(0.4), .green.opacity(0.7), .green.opacity(0.4)]
         }
 
-        // highlighting of the selected option (red or green)
         guard let selectedWord, word.compositeID == selectedWord.compositeID else {
             return nil
         }
@@ -281,7 +281,7 @@ struct QuizView: View {
             : [.red.opacity(0.4), .red.opacity(0.8), .red.opacity(0.4)]
     }
 
-    private func shake() {
+    func shake() {
         let amplitude: CGFloat = 8
         withAnimation(.default.speed(3)) {
             shakeOffset = amplitude
@@ -294,6 +294,24 @@ struct QuizView: View {
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
             withAnimation(.default.speed(3)) { shakeOffset = 0 }
+        }
+    }
+
+    func promptText(for word: Word) -> String {
+        switch mode {
+        case .direct:
+            return word.gr
+        case .reverse:
+            return isEnglish ? word.en : word.ru
+        }
+    }
+
+    func optionText(for word: Word) -> String {
+        switch mode {
+        case .direct:
+            return isEnglish ? word.en : word.ru
+        case .reverse:
+            return word.gr
         }
     }
 }

@@ -1,11 +1,6 @@
 import SwiftUI
 import SwiftData
 
-enum QuizMode {
-    case direct
-    case reverse
-}
-
 struct GroupsListView: View {
     let mode: QuizMode
     @Query(sort: [SortDescriptor(\GroupMeta.id, order: .forward)]) private var groups: [GroupMeta]
@@ -104,11 +99,6 @@ struct GroupsListView: View {
 
     @ViewBuilder
     private func destination(for group: GroupMeta) -> some View {
-        switch mode {
-        case .direct:
-            QuizView(group: group)
-        case .reverse:
-            ReverseQuizView(group: group)
-        }
+        QuizView(group: group, mode: mode)
     }
 }

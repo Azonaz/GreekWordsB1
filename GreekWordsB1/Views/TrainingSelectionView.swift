@@ -74,125 +74,54 @@ struct TrainingSelectionView: View {
     @ViewBuilder
     private func portraitLayout(_ word: Word) -> some View {
         VStack(spacing: 40) {
-            HStack(spacing: 0) {
-                Text(Texts.wordsLeft)
-                Text(" \(weakWords.count - currentIndex)")
-            }
-            .font(.headline)
-            .glassLabel(height: hSizeClass == .regular ? 70 : 50,
-                        cornerRadius: cornerRadius)
-            .padding(.horizontal, 16)
-            .padding(.top, 12)
+            wordsLeftView(
+                height: hSizeClass == .regular ? 70 : 50,
+                cornerRadius: cornerRadius,
+                horizontalPadding: 16
+            )
+                .padding(.top, 12)
 
-            Text(word.gr)
-                .font(.largeTitle.bold())
-                .multilineTextAlignment(.center)
-                .lineLimit(nil)
-                .fixedSize(horizontal: false, vertical: true)
-                .padding()
-                .glassCard(height: hSizeClass == .regular ? 140 : 120,
-                           cornerRadius: cornerRadius)
-                .padding(.horizontal, 16)
+            wordCard(word, height: hSizeClass == .regular ? 140 : 120)
                 .padding(.top, 40)
 
-            if showTranslation {
-                Text(isEnglish ? word.en : word.ru)
-                    .font(.largeTitle)
-                    .foregroundColor(.primary)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(nil)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .transition(.opacity)
-                    .padding(.horizontal, 16)
-            }
+            translationView(for: word)
+                .padding(.horizontal, 16)
 
             Spacer()
 
-            if showTranslation {
-                ratingButtons(for: word)
-            } else {
-                Button {
-                    withAnimation { showTranslation = true }
-                } label: {
-                    Text(Texts.showTranslation)
-                        .font(hSizeClass == .regular ? .title : .title2)
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(.primary)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .glassCard(height: buttonHeight,
-                                   cornerRadius: cornerRadius)
-                }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 40)
-            }
+            portraitActions(for: word)
         }
         .padding()
     }
 
-    @ViewBuilder
     private func landscapeLayout(_ word: Word) -> some View {
-        HStack(spacing: 24) {
-            Text(Texts.wordsLeft) + Text(" \(weakWords.count - currentIndex)")
-                .font(.headline)
-        }
-        .frame(maxWidth: .infinity)
-        .glassLabel(height: 55, cornerRadius: 20)
-        .padding(.horizontal, 120)
-        .padding(.top, 1)
+        VStack {
+            wordsLeftView(height: 55, cornerRadius: 20, horizontalPadding: 0)
+                .padding(.horizontal, 120)
+                .padding(.top, 1)
 
-        Spacer()
+            Spacer()
 
-        HStack(spacing: 20) {
-            VStack(spacing: 12) {
-                Text(word.gr)
-                    .font(.largeTitle.bold())
-                    .multilineTextAlignment(.center)
-                    .lineLimit(nil)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding()
-                    .glassCard(height: 100, cornerRadius: cornerRadius)
-
-                if showTranslation {
-                    Text(isEnglish ? word.en : word.ru)
-                        .font(.largeTitle)
-                        .multilineTextAlignment(.center)
-                        .transition(.opacity)
+            HStack(spacing: 20) {
+                VStack(spacing: 12) {
+                    wordCard(word, height: 100)
+                    translationView(for: word)
                 }
-            }
-            .padding(.leading, 24)
-            .frame(maxWidth: .infinity)
+                .padding(.leading, 24)
+                .frame(maxWidth: .infinity)
 
-            VStack(spacing: 12) {
-                if showTranslation {
-                    ForEach(Rating.allCases.filter { $0 != .manual }, id: \.self) { rating in
-                        Button {
-                            Task { await handleRating(rating, for: word) }
-                        } label: {
-                            Text(rating.localized)
-                                .font(.body)
-                                .foregroundColor(.primary)
-                                .frame(maxWidth: .infinity)
-                                .glassCard(height: 45, cornerRadius: 20)
-                        }
-                    }
-                } else {
-                    Button {
-                        withAnimation { showTranslation = true }
-                    } label: {
-                        Text(Texts.showTranslation)
-                            .multilineTextAlignment(.center)
-                            .foregroundColor(.primary)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .glassCard(height: 100, cornerRadius: cornerRadius)
+                VStack(spacing: 12) {
+                    if showTranslation {
+                        ratingButtons(for: word)
+                    } else {
+                        showTranslationButton(height: 100)
                     }
                 }
+                .padding(.trailing, 24)
             }
-            .padding(.trailing, 24)
-        }
 
-        Spacer()
+            Spacer()
+        }
     }
 
     @ViewBuilder
@@ -213,6 +142,67 @@ struct TrainingSelectionView: View {
         }
         .padding(.horizontal, 8)
         .padding(.bottom, 40)
+    }
+
+    private func wordCard(_ word: Word, height: CGFloat) -> some View {
+        Text(word.gr)
+            .font(.largeTitle.bold())
+            .multilineTextAlignment(.center)
+            .lineLimit(nil)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding()
+            .glassCard(height: height, cornerRadius: cornerRadius)
+            .padding(.horizontal, 16)
+    }
+
+    @ViewBuilder
+    private func translationView(for word: Word) -> some View {
+        if showTranslation {
+            Text(isEnglish ? word.en : word.ru)
+                .font(.largeTitle)
+                .foregroundColor(.primary)
+                .multilineTextAlignment(.center)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+                .transition(.opacity)
+        }
+    }
+
+    private func wordsLeftView(height: CGFloat, cornerRadius: CGFloat, horizontalPadding: CGFloat) -> some View {
+        HStack(spacing: 0) {
+            Text(Texts.wordsLeft)
+            Text(" \(weakWords.count - currentIndex)")
+        }
+        .font(.headline)
+        .frame(maxWidth: .infinity)
+        .glassLabel(height: height, cornerRadius: cornerRadius)
+        .padding(.horizontal, horizontalPadding)
+    }
+
+    private func portraitActions(for word: Word) -> some View {
+        Group {
+            if showTranslation {
+                ratingButtons(for: word)
+            } else {
+                showTranslationButton(height: buttonHeight)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 40)
+            }
+        }
+    }
+
+    private func showTranslationButton(height: CGFloat) -> some View {
+        Button {
+            withAnimation { showTranslation = true }
+        } label: {
+            Text(Texts.showTranslation)
+                .font(hSizeClass == .regular ? .title : .title2)
+                .multilineTextAlignment(.center)
+                .foregroundColor(.primary)
+                .padding()
+                .frame(maxWidth: .infinity)
+                .glassCard(height: height, cornerRadius: cornerRadius)
+        }
     }
 
     private func loadWords() async {
