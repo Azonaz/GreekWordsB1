@@ -5,6 +5,7 @@ struct ContentView: View {
     @EnvironmentObject var trainingAccess: TrainingAccessManager
     @Environment(\.modelContext) private var context
     @Environment(\.horizontalSizeClass) var sizeClass
+    @Environment(\.verticalSizeClass) var verticalSizeClass
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.scenePhase) private var scenePhase
     @State private var goTraining = false
@@ -26,6 +27,10 @@ struct ContentView: View {
         sizeClass == .regular ? 40 : 30
     }
 
+    private var isLandscapePhone: Bool {
+        sizeClass == .compact && verticalSizeClass == .compact
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -40,42 +45,52 @@ struct ContentView: View {
 
                     Spacer()
 
-                    NavigationLink(destination: GroupsListView()) {
-                        Text(Texts.quiz)
-                            .foregroundColor(.primary)
-                            .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
-                    }
-                    .padding(.horizontal, buttonPaddingHorizontal)
+                    if isLandscapePhone {
+                        HStack(alignment: .center, spacing: 24) {
+                            VStack(spacing: topPadding) {
+                                NavigationLink(destination: GroupsListView()) {
+                                    Text(Texts.quiz)
+                                        .foregroundColor(.primary)
+                                        .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
+                                }
 
-                    NavigationLink(destination: GroupsListView(mode: .reverse)) {
-                        Text(Texts.reverseQuiz)
-                            .foregroundColor(.primary)
-                            .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
-                    }
-                    .padding(.top, topPadding)
-                    .padding(.horizontal, buttonPaddingHorizontal)
+                                NavigationLink(destination: GroupsListView(mode: .reverse)) {
+                                    Text(Texts.reverseQuiz)
+                                        .foregroundColor(.primary)
+                                        .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
+                                }
+                            }
+                            .frame(maxWidth: .infinity)
 
-                    Button {
-                        trainingAccess.startTrialIfNeeded()
-                        trainingAccess.refreshState()
+                            VStack {
+                                Spacer()
 
-                        if trainingAccess.hasAccess {
-                            goTraining = true
-                        } else {
-                            goPaywall = true
+                                trainingButton
+
+                                Spacer()
+                            }
+                            .frame(maxWidth: .infinity)
                         }
-                    } label: {
-                        Text(Texts.training)
-                            .foregroundColor(.primary)
-                            .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
-                    }
-                    .padding(.top, topPadding)
-                    .padding(.horizontal, buttonPaddingHorizontal)
-                    .navigationDestination(isPresented: $goTraining) {
-                        TrainingView()
-                    }
-                    .navigationDestination(isPresented: $goPaywall) {
-                        TrainingPaywallView()
+                        .padding(.horizontal, buttonPaddingHorizontal)
+                    } else {
+                        NavigationLink(destination: GroupsListView()) {
+                            Text(Texts.quiz)
+                                .foregroundColor(.primary)
+                                .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
+                        }
+                        .padding(.horizontal, buttonPaddingHorizontal)
+
+                        NavigationLink(destination: GroupsListView(mode: .reverse)) {
+                            Text(Texts.reverseQuiz)
+                                .foregroundColor(.primary)
+                                .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
+                        }
+                        .padding(.top, topPadding)
+                        .padding(.horizontal, buttonPaddingHorizontal)
+
+                        trainingButton
+                            .padding(.top, topPadding)
+                            .padding(.horizontal, buttonPaddingHorizontal)
                     }
 
                     Spacer()
@@ -129,6 +144,12 @@ struct ContentView: View {
                     Task { await syncVocabulary() }
                 }
             }
+            .navigationDestination(isPresented: $goTraining) {
+                TrainingView()
+            }
+            .navigationDestination(isPresented: $goPaywall) {
+                TrainingPaywallView()
+            }
         }
     }
 
@@ -139,6 +160,23 @@ struct ContentView: View {
             try await service.syncVocabulary()
         } catch {
             print("Synchronisation error: \(error)")
+        }
+    }
+
+    private var trainingButton: some View {
+        Button {
+            trainingAccess.startTrialIfNeeded()
+            trainingAccess.refreshState()
+
+            if trainingAccess.hasAccess {
+                goTraining = true
+            } else {
+                goPaywall = true
+            }
+        } label: {
+            Text(Texts.training)
+                .foregroundColor(.primary)
+                .glassCard(height: buttonHeight, cornerRadius: cornerRadius)
         }
     }
 }

@@ -47,8 +47,6 @@ extension TrainingView {
     }
 }
 
-// MARK: - UI helpers
-
 private extension TrainingView {
     func statsHeaderPortrait() -> some View {
         Group {
@@ -144,7 +142,7 @@ private extension TrainingView {
         if showTranslation {
             ratingButtons(for: word, height: 45, cornerRadius: 20, direction: .vertical)
         } else {
-            showTranslationButton(height: 100, font: .body)
+            showTranslationButton(height: 100)
         }
     }
 
@@ -177,12 +175,12 @@ private extension TrainingView {
         }
     }
 
-    func showTranslationButton(height: CGFloat, font: Font? = nil) -> some View {
+    func showTranslationButton(height: CGFloat) -> some View {
         Button {
             withAnimation { showTranslation = true }
         } label: {
             Text(Texts.showTranslation)
-                .font(font ?? (sizeClass == .regular ? .title : .title2))
+                .font(sizeClass == .regular ? .title : .title2)
                 .multilineTextAlignment(.center)
                 .foregroundColor(.primary)
                 .padding()
