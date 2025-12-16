@@ -47,11 +47,6 @@
 			path = GreekWordsB1Tests;
 			sourceTree = "<group>";
 		};
-		84F3503B2EAF7CEC00E9C8C9 /* GreekWordsB1UITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = GreekWordsB1UITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,7 +81,6 @@
 				847EF0152EB2660700B068B2 /* Localizable.strings */,
 				84F350212EAF7CEA00E9C8C9 /* GreekWordsB1 */,
 				84F350312EAF7CEC00E9C8C9 /* GreekWordsB1Tests */,
-				84F3503B2EAF7CEC00E9C8C9 /* GreekWordsB1UITests */,
 				84F350202EAF7CEA00E9C8C9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -163,9 +157,6 @@
 			);
 			dependencies = (
 				84F3503A2EAF7CEC00E9C8C9 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				84F3503B2EAF7CEC00E9C8C9 /* GreekWordsB1UITests */,
 			);
 			name = GreekWordsB1UITests;
 			packageProductDependencies = (

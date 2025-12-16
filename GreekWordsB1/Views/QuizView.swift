@@ -95,7 +95,7 @@ private extension QuizView {
     var quizContent: some View {
         if let currentWord {
             let isSingleWord = !promptText(for: currentWord).contains(" ")
-            
+
             if sizeClass == .compact && vSizeClass == .compact {
                 GeometryReader { geo in
                     HStack(spacing: 16) {
