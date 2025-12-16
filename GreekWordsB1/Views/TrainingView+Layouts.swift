@@ -97,11 +97,13 @@ private extension TrainingView {
     }
 
     func wordCard(_ word: Word, height: CGFloat) -> some View {
-        Text(word.gr)
+        let isSingleWord = !word.gr.contains(" ")
+
+        return Text(word.gr)
             .font(.largeTitle.bold())
             .multilineTextAlignment(.center)
-            .lineLimit(nil)
-            .fixedSize(horizontal: false, vertical: true)
+            .lineLimit(isSingleWord ? 1 : nil)
+            .minimumScaleFactor(isSingleWord ? 0.4 : 1)
             .padding()
             .glassCard(height: height, cornerRadius: cornerRadius)
             .padding(.horizontal, 16)

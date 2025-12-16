@@ -94,13 +94,16 @@ private extension QuizView {
     @ViewBuilder
     var quizContent: some View {
         if let currentWord {
+            let isSingleWord = !promptText(for: currentWord).contains(" ")
+            
             if sizeClass == .compact && vSizeClass == .compact {
                 GeometryReader { geo in
                     HStack(spacing: 16) {
                         Text(promptText(for: currentWord))
                             .font(.largeTitle.bold())
                             .multilineTextAlignment(.center)
-                            .lineLimit(nil)
+                            .lineLimit(isSingleWord ? 1 : nil)
+                            .minimumScaleFactor(isSingleWord ? 0.4 : 1)
                             .fixedSize(horizontal: false, vertical: true)
                             .padding()
                             .glassCard(height: 120, cornerRadius: cornerRadius)
@@ -122,7 +125,8 @@ private extension QuizView {
                     Text(promptText(for: currentWord))
                         .font(.largeTitle.bold())
                         .multilineTextAlignment(.center)
-                        .lineLimit(nil)
+                        .lineLimit(isSingleWord ? 1 : nil)
+                        .minimumScaleFactor(isSingleWord ? 0.4 : 1)
                         .fixedSize(horizontal: false, vertical: true)
                         .padding()
                         .glassCard(height: sizeClass == .regular ? 140 : 120, cornerRadius: cornerRadius)

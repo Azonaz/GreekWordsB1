@@ -145,10 +145,13 @@ struct TrainingSelectionView: View {
     }
 
     private func wordCard(_ word: Word, height: CGFloat) -> some View {
-        Text(word.gr)
+        let isSingleWord = !word.gr.contains(" ")
+
+        return Text(word.gr)
             .font(.largeTitle.bold())
             .multilineTextAlignment(.center)
-            .lineLimit(nil)
+            .lineLimit(isSingleWord ? 1 : nil)
+            .minimumScaleFactor(isSingleWord ? 0.4 : 1)
             .fixedSize(horizontal: false, vertical: true)
             .padding()
             .glassCard(height: height, cornerRadius: cornerRadius)
