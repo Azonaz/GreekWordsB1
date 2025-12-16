@@ -106,7 +106,7 @@ private extension QuizView {
                             .minimumScaleFactor(isSingleWord ? 0.4 : 1)
                             .fixedSize(horizontal: false, vertical: true)
                             .padding()
-                            .glassCard(height: 120, cornerRadius: cornerRadius)
+                            .glassWordDisplay(height: 120, cornerRadius: cornerRadius)
                             .frame(width: geo.size.width * 0.4)
 
                         VStack(spacing: 16) {
@@ -129,7 +129,7 @@ private extension QuizView {
                         .minimumScaleFactor(isSingleWord ? 0.4 : 1)
                         .fixedSize(horizontal: false, vertical: true)
                         .padding()
-                        .glassCard(height: sizeClass == .regular ? 140 : 120, cornerRadius: cornerRadius)
+                        .glassWordDisplay(height: sizeClass == .regular ? 140 : 120, cornerRadius: cornerRadius)
                         .padding(.horizontal, paddingHorizontal)
                         .padding(.bottom, sizeClass == .regular ? 100 : 80)
 

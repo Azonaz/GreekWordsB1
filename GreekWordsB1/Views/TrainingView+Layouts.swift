@@ -105,7 +105,7 @@ private extension TrainingView {
             .lineLimit(isSingleWord ? 1 : nil)
             .minimumScaleFactor(isSingleWord ? 0.4 : 1)
             .padding()
-            .glassCard(height: height, cornerRadius: cornerRadius)
+            .glassWordDisplay(height: height, cornerRadius: cornerRadius)
             .padding(.horizontal, 16)
     }
 

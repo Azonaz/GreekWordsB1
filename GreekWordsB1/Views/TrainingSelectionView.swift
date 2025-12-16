@@ -154,7 +154,7 @@ struct TrainingSelectionView: View {
             .minimumScaleFactor(isSingleWord ? 0.4 : 1)
             .fixedSize(horizontal: false, vertical: true)
             .padding()
-            .glassCard(height: height, cornerRadius: cornerRadius)
+            .glassWordDisplay(height: height, cornerRadius: cornerRadius)
             .padding(.horizontal, 16)
     }
 
