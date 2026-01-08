@@ -1,7 +1,7 @@
 # Greek Words B1
 
 Greek Words B1 is an iOS app for learning and memorizing intermediate Modern Greek vocabulary (CEFR level B1).
-The app is designed to support beginners during their fird year of studying Greek, focusing on frequent words and steady repetition.
+The app is designed to support intermediate learners, focusing on useful vocabulary and consistent review.
 
 ## Screencast
 
