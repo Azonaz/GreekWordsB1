@@ -5,6 +5,7 @@ The app is designed to support intermediate learners, focusing on useful vocabul
 
 ## Screencast
 
+<img width="1134" height="308" alt="1" src="https://github.com/user-attachments/assets/98cf0050-73e0-4317-ac10-0d5adaf56bb4" />
 
 ## Features
 
