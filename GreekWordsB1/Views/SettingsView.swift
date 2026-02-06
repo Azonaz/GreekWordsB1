@@ -13,6 +13,12 @@ struct SettingsView: View {
 
     @State private var restoring = false
     @State private var restoreMessage: String?
+    @State private var showLevels = false
+    @State private var showTrainingPaywall = false
+
+    private var isTrainingPurchased: Bool {
+        trainingAccess.hasAccess && !trainingAccess.isInTrial
+    }
 
     private var cornerRadius: CGFloat {
         sizeClass == .regular ? 25 : 20
@@ -80,6 +86,42 @@ struct SettingsView: View {
                 }
                 .padding(.vertical, 8)
 
+                // Purchase
+                Button {
+                    if isTrainingPurchased { return }
+                    showTrainingPaywall = true
+                } label: {
+                    HStack(spacing: 14) {
+                        Image(systemName: trainingAccess.hasAccess ? "lock.open" : "lock")
+                            .font(.body)
+                            .imageScale(.large)
+                            .foregroundColor(.primary)
+
+                        Text(Texts.trainingAccess)
+                            .font(.body)
+                            .foregroundColor(.primary)
+
+                        Spacer()
+
+                        if isTrainingPurchased {
+                            Text(Texts.unlocked)
+                                .foregroundColor(.secondary)
+                        } else if trainingAccess.isInTrial {
+                            Text(Texts.trialDaysShort(trainingAccess.daysLeft ?? 0))
+                                .foregroundColor(.secondary)
+                        } else {
+                            Text(Texts.locked)
+                                .foregroundColor(.secondary)
+                        }
+
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.primary)
+                            .opacity(isTrainingPurchased ? 0 : 1)
+                    }
+                    .padding(.vertical, 8)
+                }
+                .disabled(isTrainingPurchased)
+
                 // Purchase recovery
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 14) {
@@ -127,6 +169,28 @@ struct SettingsView: View {
                     }
                 }
 
+                // Other levels
+                Button {
+                    showLevels = true
+                } label: {
+                    HStack(spacing: 14) {
+                        Image(systemName: "graduationcap")
+                            .font(.body)
+                            .imageScale(.large)
+                            .foregroundColor(.primary)
+
+                        Text(Texts.otherLevels)
+                            .font(.body)
+                            .foregroundColor(.primary)
+
+                        Spacer()
+
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.primary)
+                    }
+                    .padding(.vertical, 8)
+                }
+
                 // Rate the app
                 if shouldShowRateButton {
                     HStack(spacing: 14) {
@@ -166,6 +230,12 @@ struct SettingsView: View {
         .scrollContentBackground(.hidden)
         .onAppear {
             updateLanguage()
+        }
+        .navigationDestination(isPresented: $showLevels) {
+            LevelsView()
+        }
+        .navigationDestination(isPresented: $showTrainingPaywall) {
+            TrainingPaywallView()
         }
     }
 
