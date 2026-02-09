@@ -44,9 +44,11 @@ struct GroupsListView: View {
                         NavigationLink(destination: destination(for: group)) {
                             let counts = countForGroup(group, wordsByGroup: wordsByGroup, seenIDs: seenIDs)
                             let counterText = "\(counts.seen)/\(counts.total)"
+                            let title = isEnglish ? group.nameEn : group.nameRu
+                            let dynamicHeight = dynamicCardHeight(for: title, counterText: counterText)
 
                             HStack(alignment: .center) {
-                                Text(isEnglish ? group.nameEn : group.nameRu)
+                                Text(title)
                                     .font(sizeClass == .regular ? .title2 : .title3)
                                     .foregroundColor(.primary)
                                     .multilineTextAlignment(.leading)
@@ -59,8 +61,8 @@ struct GroupsListView: View {
                                     .foregroundColor(.secondary)
                             }
                             .padding(.horizontal, 20)
-                            .frame(height: cardHeight)
-                            .glassCard(height: cardHeight, cornerRadius: cornerRadius)
+                            .frame(height: dynamicHeight, alignment: .center)
+                            .glassCard(height: dynamicHeight, cornerRadius: cornerRadius)
                             .padding(.horizontal, paddingHorizontal)
                         }
                     }
@@ -85,7 +87,48 @@ struct GroupsListView: View {
         }
     }
 
-    private func countForGroup(_ group: GroupMeta, wordsByGroup: [Int: [Word]],
+    private func dynamicCardHeight(for title: String, counterText: String) -> CGFloat {
+        guard sizeClass != .regular else { return cardHeight }
+
+        let font = UIFont.preferredFont(forTextStyle: .title3)
+        let screenWidth = UIScreen.main.bounds.width
+
+        let outerHPadding = paddingHorizontal * 2
+        let innerHPadding: CGFloat = 40
+        let spacing: CGFloat = 8
+
+        let counterWidth = textWidth(counterText, font: font)
+        let availableWidth = max(0, screenWidth - outerHPadding - innerHPadding - spacing - counterWidth)
+
+        let textHeight = textHeight(title, font: font, width: availableWidth)
+        let lineHeight = max(font.lineHeight, 1)
+        let isThreeLines = textHeight > lineHeight * 2.8
+
+        return isThreeLines ? 90 : cardHeight
+    }
+
+    private func textHeight(_ text: String, font: UIFont, width: CGFloat) -> CGFloat {
+        let rect = (text as NSString).boundingRect(
+            with: CGSize(width: width, height: .greatestFiniteMagnitude),
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: [.font: font],
+            context: nil
+        )
+        return ceil(rect.height)
+    }
+
+    private func textWidth(_ text: String, font: UIFont) -> CGFloat {
+        let rect = (text as NSString).boundingRect(
+            with: CGSize(width: .greatestFiniteMagnitude, height: font.lineHeight),
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: [.font: font],
+            context: nil
+        )
+        return ceil(rect.width)
+    }
+
+    private func countForGroup(_ group: GroupMeta,
+                               wordsByGroup: [Int: [Word]],
                                seenIDs: Set<String>) -> (seen: Int, total: Int) {
         let groupWords = wordsByGroup[group.id] ?? []
         let seen = groupWords.reduce(into: 0) { result, word in
@@ -93,7 +136,6 @@ struct GroupsListView: View {
                 result += 1
             }
         }
-
         return (seen, groupWords.count)
     }
 
