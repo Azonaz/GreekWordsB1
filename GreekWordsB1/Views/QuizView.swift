@@ -17,13 +17,14 @@ struct QuizView: View {
     @State private var isCorrect: Bool?
     @State private var correctCount = 0
     @State private var showResult = false
-    @State private var isEnglish: Bool = Locale.preferredLanguages.first?.hasPrefix("en") == true
     @AppStorage("isBlurEnabled") private var isBlurEnabled = false
     @State private var answersBlurred = false
     @State private var haptic = UISelectionFeedbackGenerator()
     @State private var shakeOffset: CGFloat = 0
     @State private var answeredCount = 0
     @State private var isInteractionDisabled = false
+
+    private var isEnglish: Bool { AppLanguage.usesEnglishContent }
 
     private var currentWord: Word? {
         quizWords.isEmpty ? nil : quizWords[currentIndex]

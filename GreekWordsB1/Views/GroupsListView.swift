@@ -22,9 +22,7 @@ struct GroupsListView: View {
         sizeClass == .regular ? 48 : 24
     }
 
-    private var isEnglish: Bool {
-        Locale.preferredLanguages.first?.hasPrefix("en") == true
-    }
+    private var isEnglish: Bool { AppLanguage.usesEnglishContent }
 
     init(mode: QuizMode = .direct) {
         self.mode = mode

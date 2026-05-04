@@ -14,7 +14,8 @@ struct TrainingSelectionView: View {
     @State private var currentIndex: Int = 0
     @State private var showTranslation = false
     @State private var finished = false
-    @State private var isEnglish: Bool = Locale.preferredLanguages.first?.hasPrefix("en") == true
+
+    private var isEnglish: Bool { AppLanguage.usesEnglishContent }
 
     private var currentWord: Word? {
         weakWords[safe: currentIndex]
