@@ -38,6 +38,14 @@ struct QuizView: View {
         sizeClass == .regular ? 40 : 30
     }
 
+    private var isPhone: Bool {
+        UIDevice.current.userInterfaceIdiom == .phone
+    }
+
+    private var answerCardHeight: CGFloat {
+        isPhone ? 70 : 80
+    }
+
     init(group: GroupMeta, mode: QuizMode = .direct) {
         self.group = group
         self.mode = mode
@@ -112,7 +120,7 @@ private extension QuizView {
 
                         VStack(spacing: 16) {
                             ForEach(options, id: \.compositeID) { word in
-                                answerView(for: word, height: 60)
+                                answerView(for: word, height: isPhone ? 70 : 60)
                                     .frame(width: geo.size.width * 0.6)
                             }
                         }
@@ -135,7 +143,7 @@ private extension QuizView {
                         .padding(.bottom, sizeClass == .regular ? 100 : 80)
 
                     ForEach(options, id: \.compositeID) { word in
-                        answerView(for: word, height: sizeClass == .regular ? 80 : 60)
+                        answerView(for: word, height: sizeClass == .regular ? answerCardHeight : (isPhone ? 70 : 60))
                     }
                 }
             }
@@ -149,6 +157,7 @@ private extension QuizView {
         Text(optionText(for: word))
             .offset(x: (isCorrect == false && word.compositeID == selectedWord?.compositeID) ? shakeOffset : 0)
             .font(.title3)
+            .fixedSize(horizontal: false, vertical: true)
             .foregroundColor(.primary)
             .blur(radius: answersBlurred ? 8 : 0)
             .opacity(answersBlurred ? 0.9 : 1)
@@ -156,7 +165,8 @@ private extension QuizView {
             .glassCard(
                 height: height,
                 cornerRadius: cornerRadius,
-                highlightColors: highlightColors(for: word)
+                highlightColors: highlightColors(for: word),
+                lineLimit: isPhone ? 2 : 1
             )
             .padding(.horizontal, paddingHorizontal)
             .onTapGesture {

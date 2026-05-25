@@ -4,6 +4,7 @@ struct GlassCard: ViewModifier {
     var height: CGFloat
     var cornerRadius: CGFloat
     var highlightColors: [Color]?
+    var lineLimit: Int?
 
     @State private var glowStrength: CGFloat = 0
     @State private var phase: CGFloat = 0
@@ -21,7 +22,7 @@ struct GlassCard: ViewModifier {
 
         content
             .multilineTextAlignment(.center)
-            .lineLimit(1)
+            .lineLimit(lineLimit)
             .frame(height: height)
             .frame(maxWidth: .infinity)
             .font(.title)
@@ -105,7 +106,7 @@ struct GlassCard: ViewModifier {
 }
 
 extension View {
-    func glassCard(height: CGFloat, cornerRadius: CGFloat, highlightColors: [Color]? = nil) -> some View {
-        modifier(GlassCard(height: height, cornerRadius: cornerRadius, highlightColors: highlightColors))
+    func glassCard(height: CGFloat, cornerRadius: CGFloat, highlightColors: [Color]? = nil, lineLimit: Int? = 1) -> some View {
+        modifier(GlassCard(height: height, cornerRadius: cornerRadius, highlightColors: highlightColors, lineLimit: lineLimit))
     }
 }
