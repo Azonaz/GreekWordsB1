@@ -106,7 +106,9 @@ struct GlassCard: ViewModifier {
 }
 
 extension View {
-    func glassCard(height: CGFloat, cornerRadius: CGFloat, highlightColors: [Color]? = nil, lineLimit: Int? = 1) -> some View {
-        modifier(GlassCard(height: height, cornerRadius: cornerRadius, highlightColors: highlightColors, lineLimit: lineLimit))
+    func glassCard(height: CGFloat, cornerRadius: CGFloat,
+                   highlightColors: [Color]? = nil, lineLimit: Int? = 1) -> some View {
+        modifier(GlassCard(height: height, cornerRadius: cornerRadius,
+                           highlightColors: highlightColors, lineLimit: lineLimit))
     }
 }
