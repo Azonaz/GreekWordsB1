@@ -46,6 +46,18 @@ enum Texts {
     static let otherLevels: LocalizedStringKey = "otherLevels"
     static let unlocked: LocalizedStringKey = "unlocked"
     static let locked: LocalizedStringKey = "locked"
+    static let close: LocalizedStringKey = "close"
+    static let tutorial: LocalizedStringKey = "tutorial"
+    static let onboardingQuizTitle: LocalizedStringKey = "onboardingQuizTitle"
+    static let onboardingQuizText: LocalizedStringKey = "onboardingQuizText"
+    static let onboardingHiddenTitle: LocalizedStringKey = "onboardingHiddenTitle"
+    static let onboardingHiddenText: LocalizedStringKey = "onboardingHiddenText"
+    static let onboardingTrainingTitle: LocalizedStringKey = "onboardingTrainingTitle"
+    static let onboardingTrainingText: LocalizedStringKey = "onboardingTrainingText"
+    static let onboardingReviewTitle: LocalizedStringKey = "onboardingReviewTitle"
+    static let onboardingReviewText: LocalizedStringKey = "onboardingReviewText"
+    static let onboardingSettingsTitle: LocalizedStringKey = "onboardingSettingsTitle"
+    static let onboardingSettingsText: LocalizedStringKey = "onboardingSettingsText"
 
     static var allWords: String {
         NSLocalizedString("allWords", comment: "")

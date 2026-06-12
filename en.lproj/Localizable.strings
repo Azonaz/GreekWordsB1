@@ -90,3 +90,23 @@ To open a group, complete at least one topic in the Quiz section.";
 "freeTrialActive" = "Free trial active";
 "unlocked" = "Unlocked";
 "locked" = "Locked";
+"close" = "Close";
+"tutorial" = "Tutorial";
+"onboardingQuizTitle" = "Practice words in quizzes";
+"onboardingQuizText" = "Words in quizzes are grouped by topic.
+In the regular quiz, choose the translation of a Greek word. In the reverse quiz, choose the Greek word from its translation.
+Each round has 10 questions.";
+"onboardingHiddenTitle" = "Make practice harder";
+"onboardingHiddenText" = "Hidden mode for quizzes.
+First, try to remember the word. Then reveal the options and choose the correct answer.";
+"onboardingTrainingTitle" = "Reinforce words in training";
+"onboardingTrainingText" = "Spaced repetition helps you remember words better.
+Take a quiz on a topic to add its words to training.
+Tap the Greek word card to hear pronunciation.";
+"onboardingReviewTitle" = "Remember words long-term";
+"onboardingReviewText" = "In training, you review words.
+After each answer, rate how easily you remembered the word. This determines when it will appear again.";
+"onboardingSettingsTitle" = "Set it up your way";
+"onboardingSettingsText" = "Set the translation language, how many new words you learn per day, and whether answers are shown in quizzes.
+
+You can revisit this tutorial anytime in Settings.";
