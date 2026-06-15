@@ -10,6 +10,7 @@ struct ContentView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var goTraining = false
     @State private var goPaywall = false
+    @State private var isSyncingVocabulary = false
 
     private var buttonHeight: CGFloat {
         sizeClass == .regular ? 100 : 80
@@ -154,9 +155,14 @@ struct ContentView: View {
     }
 
     func syncVocabulary() async {
+        guard !isSyncingVocabulary else { return }
+
+        isSyncingVocabulary = true
+        defer { isSyncingVocabulary = false }
+
         do {
             let url = URL(string: baseURL)!
-            let service = VocabularySyncService(context: context, remoteURL: url)
+            let service = VocabularySyncService(modelContainer: context.container, remoteURL: url)
             try await service.syncVocabulary()
         } catch {
             print("Synchronisation error: \(error)")
