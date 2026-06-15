@@ -46,7 +46,6 @@ enum Texts {
     static let otherLevels: LocalizedStringKey = "otherLevels"
     static let unlocked: LocalizedStringKey = "unlocked"
     static let locked: LocalizedStringKey = "locked"
-    static let close: LocalizedStringKey = "close"
     static let tutorial: LocalizedStringKey = "tutorial"
     static let onboardingQuizTitle: LocalizedStringKey = "onboardingQuizTitle"
     static let onboardingQuizText: LocalizedStringKey = "onboardingQuizText"
